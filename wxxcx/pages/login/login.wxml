@@ -1,0 +1,33 @@
+<view class="container">
+  <view class="header">
+    <image class="logo" src="/assets/logo.png" mode="aspectFit"></image> <!-- Placeholder logo -->
+    <text class="title">HBUT 教务助手</text>
+    <text class="subtitle">更优雅的查分体验</text>
+  </view>
+
+  <view class="form-card">
+    <view class="input-group">
+      <text class="label">学号</text>
+      <input class="input" type="number" placeholder="请输入学号" model:value="{{username}}" />
+    </view>
+
+    <view class="input-group">
+      <text class="label">密码</text>
+      <input class="input" password type="text" placeholder="请输入密码" model:value="{{password}}" />
+    </view>
+
+    <view class="input-group">
+      <text class="label">验证码</text>
+      <view class="captcha-row">
+        <input class="input captcha-input" type="text" placeholder="验证码" model:value="{{captcha}}" />
+        <image class="captcha-img" src="{{captchaImg}}" bindtap="loadCaptcha"></image>
+      </view>
+    </view>
+
+    <button class="login-btn" bindtap="handleLogin" loading="{{loading}}" disabled="{{loading}}">登录</button>
+  </view>
+  
+  <view class="footer">
+    <text>Designed for HBUTers</text>
+  </view>
+</view>

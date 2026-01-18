@@ -1,0 +1,84 @@
+==========================================
+宝塔面板 Python 项目管理器启动方式配置
+==========================================
+
+问题：宝塔面板只有"命令行启动"、"uwsgi"、"gunicorn"可选，没有 uvicorn
+
+解决方案：
+
+【方案一：使用 Gunicorn】⭐ 推荐
+----------------------------------------
+启动方式：选择 "gunicorn"
+启动文件/应用名：cjcx+pm:app
+绑定IP和端口：0.0.0.0:8000
+进程数：2（根据服务器配置调整）
+Worker类型：uvicorn.workers.UvicornWorker  ⚠️ 必须填写这个！
+
+说明：
+- Gunicorn 是一个成熟的 WSGI/ASGI 服务器
+- 通过 uvicorn.workers.UvicornWorker 可以让 Gunicorn 运行 ASGI 应用（FastAPI）
+- 性能稳定，适合生产环境
+
+【方案二：使用命令行启动】
+----------------------------------------
+启动方式：选择 "命令行启动"
+启动命令：
+/www/server/python/py3.11/bin/uvicorn cjcx+pm:app --host 0.0.0.0 --port 8000 --workers 2
+
+注意：请根据实际的 Python 路径修改命令
+查找路径方法：
+- SSH 执行：which python3
+- SSH 执行：find /www/server/python -name uvicorn
+
+【方案三：使用 Systemd】⭐ 最稳定
+----------------------------------------
+不使用宝塔面板的 Python 项目管理器，直接使用 systemd 服务
+
+详细步骤见：部署指南.md 的"三、配置进程守护（Systemd）"章节
+
+==========================================
+推荐配置（Gunicorn）
+==========================================
+
+在宝塔面板 Python 项目管理器中：
+
+基本配置：
+- 项目名称：hbut-api
+- 项目路径：/www/wwwroot/hbut.zmj888.asia
+- Python 版本：3.11（或已安装的版本）
+- 框架：其他
+- 启动方式：gunicorn
+- 启动文件/应用名：cjcx+pm:app
+- 绑定IP和端口：0.0.0.0:8000
+- 进程数：2
+- Worker类型：uvicorn.workers.UvicornWorker
+
+高级配置（如果有）：
+--workers 2 --worker-class uvicorn.workers.UvicornWorker --timeout 60 --bind 0.0.0.0:8000
+
+==========================================
+验证部署
+==========================================
+
+1. 在宝塔面板中查看项目状态，应该显示"运行中"
+2. SSH 执行：netstat -tlnp | grep 8000（应该看到 8000 端口在监听）
+3. 浏览器访问：http://hbut.zmj888.asia（应该能看到登录页面）
+
+==========================================
+常见问题
+==========================================
+
+Q: Worker类型填写什么？
+A: 必须填写 uvicorn.workers.UvicornWorker（注意大小写）
+
+Q: 找不到 uvicorn.workers.UvicornWorker？
+A: 确保已安装 uvicorn 和 gunicorn：
+   /www/server/python/py3.11/bin/pip3 install uvicorn[standard] gunicorn
+
+Q: 进程数设置多少？
+A: 公式：CPU核心数 × 2 + 1
+   例如：2核CPU → 5个进程，4核CPU → 9个进程
+   建议：小型服务器设置为 2-4
+
+==========================================
+

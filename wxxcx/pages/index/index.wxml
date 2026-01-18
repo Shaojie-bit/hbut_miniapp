@@ -1,0 +1,89 @@
+<view class="container">
+  
+  <!-- 1. Header & Rank Card -->
+  <view class="header-section">
+    <view class="welcome-text">
+       <text class="greeting">Hello, HBUTer 👋</text>
+       <text class="sub-greeting">你的学业表现</text>
+    </view>
+
+    <!-- Rank Card with Glassmorphism -->
+    <view class="rank-card {{showRankCard ? 'expanded' : ''}}" bindtap="toggleRanking">
+      <view class="rank-bg"></view> <!-- Gradient BG -->
+      <view class="rank-content">
+        <view class="rank-header">
+           <view class="rank-title">
+             <text class="icon">🎓</text>
+             <text>我的排名</text>
+           </view>
+           <view class="action-hint" wx:if="{{!showRankCard}}">
+             点击查看 <text class="arrow">▼</text>
+           </view>
+        </view>
+
+        <!-- Hidden Details (Slide Down) -->
+        <view class="rank-details" wx:if="{{showRankCard}}">
+           <view class="gpa-giant">
+             <text class="label">平均学分绩点</text>
+             <text class="value">{{rankData.gpa || '--'}}</text>
+           </view>
+           
+           <view class="stats-row">
+             <view class="stat-item">
+               <text class="stat-label">专业排名</text>
+               <text class="stat-val">{{rankData.major_rank || '--'}}</text>
+             </view>
+             <view class="stat-line"></view>
+             <view class="stat-item">
+               <text class="stat-label">班级排名</text>
+               <text class="stat-val">{{rankData.class_rank || '--'}}</text>
+             </view>
+             <view class="stat-line"></view>
+             <view class="stat-item">
+               <text class="stat-label">算术平均</text>
+               <text class="stat-val">{{rankData.avg_score || '--'}}</text>
+             </view>
+           </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 2. Course List (Grouped by Semester) -->
+  <scroll-view scroll-y class="course-list-container">
+    <block wx:for="{{semesterGroups}}" wx:key="semesterName" wx:for-item="group">
+      <view class="semester-section">
+        <view class="semester-header">
+          <text class="semester-title">{{group.semesterName}}</text>
+          <text class="semester-count">{{group.courses.length}} 门课程</text>
+        </view>
+        
+        <view class="course-grid">
+          <block wx:for="{{group.courses}}" wx:key="course_name" wx:for-item="course">
+            <view class="course-card {{course.isFail ? 'fail-card' : ''}}">
+              <view class="card-top">
+                <text class="course-name">{{course.course_name}}</text>
+                <text class="course-score {{course.isFail ? 'fail-text' : ''}}">{{course.score}}</text>
+              </view>
+              <view class="card-bottom">
+                <view class="tag-row">
+                   <text class="tag {{course.type === '必修' ? 'tag-primary' : 'tag-default'}}">{{course.type}}</text>
+                   <text class="tag tag-credit">{{course.credit}} 学分</text>
+                </view>
+              </view>
+            </view>
+          </block>
+        </view>
+      </view>
+    </block>
+    
+    <!-- Empty State -->
+    <view wx:if="{{semesterGroups.length === 0}}" class="empty-state">
+      <image src="/assets/empty.png" mode="widthFix" class="empty-img"></image>
+      <text>加载中或暂无数据...</text>
+    </view>
+    
+    <view class="footer-spacing"></view>
+  </scroll-view>
+
+</view>

@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HBUT 成绩查询调试 (含筛选)</title>
+    <style>
+        /* 保持之前的样式，增加筛选栏样式 */
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f4f9; padding: 20px; color: #333; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h2 { border-bottom: 2px solid #007bff; padding-bottom: 10px; color: #007bff; }
+        .step { margin-bottom: 30px; padding: 15px; border: 1px solid #e0e0e0; border-radius: 8px; background: #fafafa; }
+        .step.active { border-color: #007bff; background: #f0f7ff; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, select { width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        button { background-color: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 16px; transition: 0.3s; }
+        button:hover { background-color: #0056b3; }
+        .captcha-box { display: flex; gap: 10px; align-items: center; }
+        #captcha-img { border: 1px solid #ddd; height: 50px; cursor: pointer; border-radius: 4px; }
+        
+        /* 表格样式优化 */
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #007bff; color: white; position: sticky; top: 0; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        .retake { color: red; font-weight: bold; }
+        .score-pass { color: green; font-weight: bold; }
+        .score-fail { color: red; font-weight: bold; }
+
+        /* 筛选栏 */
+        .filter-bar { display: flex; gap: 10px; margin-bottom: 15px; padding: 10px; background: #eee; border-radius: 4px; align-items: center; }
+        .filter-bar select { width: auto; flex-grow: 1; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>🚀 HBUT 成绩查询 (全量版)</h2>
+
+    <div class="step active" id="step1">
+        <h3>1. 身份认证</h3>
+        <div class="form-group captcha-box">
+            <img id="captcha-img" src="" onclick="loadCaptcha()" title="点击刷新">
+            <button onclick="loadCaptcha()">刷新验证码</button>
+        </div>
+        <div class="form-group">
+            <input type="text" id="username" placeholder="学号" value="">
+        </div>
+        <div class="form-group">
+            <input type="password" id="password" placeholder="密码">
+        </div>
+        <div class="form-group">
+            <input type="text" id="captcha-input" placeholder="输入验证码" maxlength="4">
+        </div>
+        <button id="btn-login" onclick="doLogin()">登录并获取成绩</button>
+        <div id="msg-log" style="margin-top:10px; color: red;"></div>
+    </div>
+
+    <div class="step" id="step2" style="display:none;">
+        <h3>2. 成绩单</h3>
+        
+        <div class="filter-bar">
+            <label>📅 选择学期：</label>
+            <select id="semester-select" onchange="filterTable()">
+                <option value="all">全部学期</option>
+            </select>
+            <span id="stats-info" style="font-size: 0.9em; color: #666;"></span>
+        </div>
+
+        <div style="overflow-y: auto; max-height: 500px;">
+            <table id="grade-table">
+                <thead>
+                    <tr>
+                        <th>学期</th>
+                        <th>课程名称</th>
+                        <th>性质</th>
+                        <th>学分</th>
+                        <th>成绩</th>
+                    </tr>
+                </thead>
+                <tbody id="grade-tbody">
+                    </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    const API_BASE = "http://127.0.0.1:8000";
+    let currentCaptchaToken = "";
+    let allGradesData = []; // 存储所有成绩
+
+    window.onload = loadCaptcha;
+
+    async function loadCaptcha() {
+        try {
+            const res = await fetch(`${API_BASE}/api/captcha`);
+            const json = await res.json();
+            if (json.code === 200) {
+                document.getElementById('captcha-img').src = json.data.image;
+                currentCaptchaToken = json.data.token;
+            }
+        } catch (e) { alert("连接后端失败"); }
+    }
+
+    async function doLogin() {
+        const u = document.getElementById('username').value;
+        const p = document.getElementById('password').value;
+        const c = document.getElementById('captcha-input').value;
+        const btn = document.getElementById('btn-login');
+        const log = document.getElementById('msg-log');
+
+        btn.disabled = true;
+        btn.innerText = "登录中...";
+        log.innerText = "";
+
+        try {
+            // 1. 登录
+            const loginRes = await fetch(`${API_BASE}/api/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ token: currentCaptchaToken, username: u, password: p, captcha: c })
+            });
+            const loginJson = await loginRes.json();
+
+            if (loginJson.code !== 200) {
+                throw new Error(loginJson.msg);
+            }
+
+            // 2. 拉取成绩
+            btn.innerText = "正在拉取成绩...";
+            const gradeRes = await fetch(`${API_BASE}/api/grades`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ token: loginJson.user_token })
+            });
+            const gradeJson = await gradeRes.json();
+
+            if (gradeJson.code === 200) {
+                // 成功！
+                allGradesData = gradeJson.data;
+                initGradeView();
+                document.getElementById('step2').style.display = 'block';
+                document.getElementById('step1').style.display = 'none';
+            } else {
+                throw new Error("成绩获取失败");
+            }
+
+        } catch (e) {
+            log.innerText = e.message;
+            loadCaptcha(); // 失败要刷新验证码
+        } finally {
+            btn.disabled = false;
+            btn.innerText = "登录并获取成绩";
+        }
+    }
+
+    // 初始化视图：填充下拉框
+    function initGradeView() {
+        const semesterSet = new Set();
+        allGradesData.forEach(g => semesterSet.add(g.semester));
+        
+        // 排序：最新的学期排前面
+        const sortedSemesters = Array.from(semesterSet).sort().reverse();
+        
+        const select = document.getElementById('semester-select');
+        select.innerHTML = '<option value="all">全部学期</option>';
+        sortedSemesters.forEach(sem => {
+            select.innerHTML += `<option value="${sem}">${sem}</option>`;
+        });
+
+        // 默认显示全部
+        renderTable(allGradesData);
+    }
+
+    // 筛选逻辑
+    function filterTable() {
+        const selected = document.getElementById('semester-select').value;
+        if (selected === 'all') {
+            renderTable(allGradesData);
+        } else {
+            const filtered = allGradesData.filter(g => g.semester === selected);
+            renderTable(filtered);
+        }
+    }
+
+    // 渲染表格
+    function renderTable(data) {
+        const tbody = document.getElementById('grade-tbody');
+        tbody.innerHTML = "";
+        
+        let totalCredit = 0;
+
+        data.forEach(row => {
+            // 简单统计学分 (只算数字)
+            const credit = parseFloat(row.credit) || 0;
+            totalCredit += credit;
+
+            const isRetake = row.is_retake ? 'class="retake"' : '';
+            const retakeText = row.is_retake ? '<span style="color:red">[重修]</span> ' : '';
+            
+            // 成绩颜色
+            let scoreClass = "";
+            let scoreVal = parseFloat(row.score);
+            if (!isNaN(scoreVal)) {
+                scoreClass = scoreVal >= 60 ? "score-pass" : "score-fail";
+            }
+
+            tbody.innerHTML += `
+                <tr ${isRetake}>
+                    <td>${row.semester}</td>
+                    <td>${retakeText}${row.course_name}</td>
+                    <td>${row.type}</td>
+                    <td>${row.credit}</td>
+                    <td class="${scoreClass}">${row.score}</td>
+                </tr>
+            `;
+        });
+
+        document.getElementById('stats-info').innerText = `共 ${data.length} 门课，总学分: ${totalCredit.toFixed(1)}`;
+    }
+</script>
+
+</body>
+</html>

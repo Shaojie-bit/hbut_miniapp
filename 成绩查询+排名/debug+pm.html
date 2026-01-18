@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HBUT 教务系统 (含排名)</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f4f9; padding: 20px; color: #333; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h2 { border-bottom: 2px solid #007bff; padding-bottom: 10px; color: #007bff; }
+        .step { margin-bottom: 30px; padding: 15px; border: 1px solid #e0e0e0; border-radius: 8px; background: #fafafa; }
+        .form-group { margin-bottom: 15px; }
+        input, select { width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        button { background-color: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; transition: 0.3s; }
+        button:hover { background-color: #0056b3; }
+        .captcha-box { display: flex; gap: 10px; align-items: center; }
+        
+        /* 表格样式 */
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #007bff; color: white; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        .score-fail { color: red; font-weight: bold; }
+
+        /* 排名卡片样式 */
+        .rank-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none; /* 默认隐藏 */
+            box-shadow: 0 4px 15px rgba(118, 75, 162, 0.4);
+        }
+        .rank-header { display: flex; justify-content: space-between; align-items: center; }
+        .gpa-box h4 { margin: 0; opacity: 0.8; font-weight: normal; font-size: 14px; }
+        .gpa-box div { font-size: 36px; font-weight: bold; }
+        .rank-details { text-align: right; font-size: 14px; }
+        .rank-footer { margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 10px; font-size: 13px; opacity: 0.9; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>🚀 HBUT 成绩与排名查询</h2>
+
+    <div class="step" id="step1">
+        <h3>1. 身份认证</h3>
+        <div class="form-group captcha-box">
+            <img id="captcha-img" src="" onclick="loadCaptcha()" style="height:40px; border:1px solid #ccc; cursor:pointer">
+            <button onclick="loadCaptcha()">刷新</button>
+        </div>
+        <div class="form-group"><input type="text" id="username" placeholder="学号"></div>
+        <div class="form-group"><input type="password" id="password" placeholder="密码"></div>
+        <div class="form-group"><input type="text" id="captcha-input" placeholder="验证码"></div>
+        <button id="btn-login" onclick="doLogin()">登录</button>
+        <div id="msg-log" style="color:red; margin-top:5px"></div>
+    </div>
+
+    <div class="step" id="step2" style="display:none;">
+        <h3>2. 成绩单</h3>
+        
+        <div id="rank-card" class="rank-card">
+            <div class="rank-header">
+                <div class="gpa-box">
+                    <h4>平均学分绩点 (GPA)</h4>
+                    <div id="rank-gpa">--</div>
+                </div>
+                <div class="rank-details">
+                    <div>专业排名: <strong id="rank-major" style="font-size:18px">--</strong></div>
+                    <div style="margin-top:5px">班级排名: <strong id="rank-class" style="font-size:18px">--</strong></div>
+                </div>
+            </div>
+            <div class="rank-footer">
+                平均分: <span id="rank-avg">--</span> | 不及格门数: <span id="rank-fail">--</span>
+            </div>
+        </div>
+
+        <div style="display:flex; gap:10px; margin-bottom:15px; align-items:center; background:#eee; padding:10px; border-radius:5px;">
+            <label>学期：</label>
+            <select id="semester-select" onchange="filterTable()" style="flex:1;">
+                <option value="all">全部学期</option>
+            </select>
+            <button onclick="getRankings()" style="background-color: #28a745;">🏆 查看排名</button>
+        </div>
+
+        <div style="overflow-y: auto; max-height: 500px;">
+            <table id="grade-table">
+                <thead>
+                    <tr><th>学期</th><th>课程名称</th><th>性质</th><th>学分</th><th>成绩</th></tr>
+                </thead>
+                <tbody id="grade-tbody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    const API_BASE = "http://127.0.0.1:8000";
+    let currentToken = "", userToken = "", allGrades = [];
+
+    window.onload = loadCaptcha;
+
+    async function loadCaptcha() {
+        try {
+            const res = await fetch(`${API_BASE}/api/captcha`);
+            const json = await res.json();
+            document.getElementById('captcha-img').src = json.data.image;
+            currentToken = json.data.token;
+        } catch (e) { alert("后端未启动"); }
+    }
+
+    async function doLogin() {
+        const u = document.getElementById('username').value;
+        const p = document.getElementById('password').value;
+        const c = document.getElementById('captcha-input').value;
+        const btn = document.getElementById('btn-login');
+
+        if(!u || !p || !c) return alert("请填写完整");
+        btn.innerText = "登录中..."; btn.disabled = true;
+
+        try {
+            // 登录
+            const loginRes = await fetch(`${API_BASE}/api/login`, {
+                method: 'POST', headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ token: currentToken, username: u, password: p, captcha: c })
+            });
+            const loginData = await loginRes.json();
+            if(loginData.code !== 200) throw new Error(loginData.msg);
+            
+            userToken = loginData.user_token;
+
+            // 拉取成绩
+            btn.innerText = "获取成绩...";
+            const gradeRes = await fetch(`${API_BASE}/api/grades`, {
+                method: 'POST', headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ token: userToken })
+            });
+            const gradeData = await gradeRes.json();
+            if(gradeData.code !== 200) throw new Error(gradeData.msg);
+
+            allGrades = gradeData.data;
+            initView();
+
+        } catch (e) {
+            document.getElementById('msg-log').innerText = e.message;
+            loadCaptcha();
+        } finally {
+            btn.innerText = "登录"; btn.disabled = false;
+        }
+    }
+
+    // 获取排名
+    async function getRankings() {
+        const u = document.getElementById('username').value;
+        const sem = document.getElementById('semester-select').value;
+        const btn = document.querySelector('button[onclick="getRankings()"]');
+        
+        btn.innerText = "查询中..."; btn.disabled = true;
+
+        try {
+            const res = await fetch(`${API_BASE}/api/rankings`, {
+                method: 'POST', headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ token: userToken, username: u, semester: sem })
+            });
+            const json = await res.json();
+
+            if(json.code === 200) {
+                const d = json.data;
+                document.getElementById('rank-card').style.display = 'block';
+                document.getElementById('rank-gpa').innerText = d.gpa;
+                document.getElementById('rank-major').innerText = d.major_rank;
+                document.getElementById('rank-class').innerText = d.class_rank;
+                document.getElementById('rank-avg').innerText = d.avg_score;
+                document.getElementById('rank-fail').innerText = d.fail_count;
+            } else {
+                alert("获取排名失败: " + json.msg);
+            }
+        } catch(e) { alert("请求出错"); }
+        finally { btn.innerText = "🏆 查看排名"; btn.disabled = false; }
+    }
+
+    function initView() {
+        document.getElementById('step1').style.display = 'none';
+        document.getElementById('step2').style.display = 'block';
+        
+        const sems = [...new Set(allGrades.map(g => g.semester))].sort().reverse();
+        const sel = document.getElementById('semester-select');
+        sel.innerHTML = '<option value="all">全部学期</option>';
+        sems.forEach(s => sel.innerHTML += `<option value="${s}">${s}</option>`);
+        
+        filterTable();
+    }
+
+    function filterTable() {
+        const sel = document.getElementById('semester-select').value;
+        const tbody = document.getElementById('grade-tbody');
+        tbody.innerHTML = "";
+        
+        const data = sel === 'all' ? allGrades : allGrades.filter(g => g.semester === sel);
+        data.forEach(row => {
+            const isFail = parseFloat(row.score) < 60 || row.score.includes("不及格");
+            tbody.innerHTML += `
+                <tr>
+                    <td>${row.semester}</td>
+                    <td>${row.course_name}</td>
+                    <td>${row.type}</td>
+                    <td>${row.credit}</td>
+                    <td class="${isFail ? 'score-fail' : ''}">${row.score}</td>
+                </tr>`;
+        });
+    }
+</script>
+</body>
+</html>

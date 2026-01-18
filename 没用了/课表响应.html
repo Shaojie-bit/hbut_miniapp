@@ -1,0 +1,2093 @@
+
+<!DOCTYPE html>
+    
+<!DOCTYPE html>
+<html style="overflow-x:auto;overflow-y:auto;">
+<head>
+    <title>学生端学生成绩查询-Powered by ChaoXing</title>
+    
+<!DOCTYPE html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="keywords" content="湖北工业大学综合教务管理系统">
+<meta name="description" content="湖北工业大学综合教务管理系统">
+
+         <link rel="shortcut icon" href="/admin/system/attachment/showImage/9df8ff9f48dc41cba17ae3c690b6af87?_t=1768303707405">
+<link href="/static/vendors/bootstrap/css/bootstrap.min.css?_t=1768303707405" rel="stylesheet">
+<link href="/static/vendors/font-awesome/css/font-awesome.min.css?_t=1768303707405" rel="stylesheet">
+<link href="/static/vendors/animate/css/animate.css?_t=1768303707405" rel="stylesheet">
+<link type="text/css" rel="stylesheet" href="/static/vendors/iCheck/skins/all.css?_t=1768303707405">
+<link href="/static/vendors/datepicker/datepicker3.css?_t=1768303707405" rel="stylesheet">
+<!-- jqgrid-->
+		<link href="/static/vendors/jqgrid/css/ui.jqgrid-bootstrap.css?_t=1768303707405" rel="stylesheet">
+<!-- Sweet Alert -->
+		<link href="/static/vendors/sweetalert/sweetalert.css?_t=1768303707405" rel="stylesheet">
+<!-- jquery-ui -->
+		<link type="text/css" rel="stylesheet"  href="/static/vendors/jquery-ui-1.10.4.custom/css/ui-lightness/jquery-ui-1.14.0.custom.min.css?_t=1768303707405"/>
+
+
+<!-- 由于使用了自定义标签，jquery必须在之前 -->
+<!-- 全局js -->
+<script src="/static/vendors/jquery/js/jquery.min.js?_t=1768303707405"></script>
+<script src="/static/common/js/prototype.js?_t=1768303707405"></script>
+       <script src="/static/common/js/func.js?_t=1768303707405"></script>
+<script src="/static/vendors/jquery-ui/jquery-ui.min.js?_t=1768303707405"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    
+    
+    
+        <link href="/static/common/css/style.css?_t=1768303707405" rel="stylesheet">
+    
+
+<script src="/static/common/demo/imgViewer/js/imgView.js?_t=1768303707405"></script>
+<link rel="stylesheet" type="text/css" href="/static/common/demo/imgViewer/css/style.css?_t=1768303707405"/>
+    
+    
+    <meta name="decorator" content="list"/>
+    <!--  Validform -->
+		<link href="/static/vendors/bootstrap-fileinput/css/fileinput.css?_t=1768303707405" media="all" rel="stylesheet" type="text/css"/>
+	    <link href="/static/vendors/bootstrap-fileinput/themes/explorer/theme.css?_t=1768303707405" media="all" rel="stylesheet" type="text/css"/>
+	    <!-- some CSS styling changes and overrides -->
+		<style>
+		.kv-avatar .file-preview-frame,.kv-avatar .file-preview-frame:hover {
+		    margin: 0;
+		    padding: 0;
+		    border: none;
+		    box-shadow: none;
+		    text-align: center;
+		}
+		</style>
+
+    <!-- simditor -->
+		<link rel="stylesheet" type="text/css" href="/static/vendors/simditor/css/simditor.css?_t=1768303707405" />
+
+    <link href="/static/common/css/ySelect.css?_t=1768303707405" type="text/css" rel="stylesheet">
+    <script src="/static/common/js/ySelect.js?_t=1768303707405"></script>
+    <script type="text/javascript">
+
+
+    </script>
+    <script>
+        $(function () {
+            $('#kcxz').ySelect();
+        });
+    </script>
+
+    <style>
+        .dropload-up, .dropload-down {
+            position: relative;
+            height: 0;
+            overflow: hidden;
+            font-size: 12px;
+            /* 开启硬件加速 */
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
+        }
+
+        .dropload-down {
+            height: 50px;
+        }
+
+        .dropload-refresh, .dropload-update, .dropload-load, .dropload-noData {
+            line-height: 50px;
+            text-align: center;
+        }
+
+        .dropload-load .loading {
+            display: inline-block;
+            height: 15px;
+            width: 15px;
+            border-radius: 100%;
+            margin: 6px;
+            border: 2px solid #666;
+            border-bottom-color: transparent;
+            vertical-align: middle;
+            -webkit-animation: rotate 0.75s linear infinite;
+            animation: rotate 0.75s linear infinite;
+        }
+
+        @-webkit-keyframes rotate {
+            0% {
+                -webkit-transform: rotate(0deg);
+            }
+            50% {
+                -webkit-transform: rotate(180deg);
+            }
+            100% {
+                -webkit-transform: rotate(360deg);
+            }
+        }
+
+        @keyframes rotate {
+            0% {
+                transform: rotate(0deg);
+            }
+            50% {
+                transform: rotate(180deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+    <script src="/static/js/xkgl/dropload.min.js?_t=1768303707405"></script>
+    <script>
+        $(function () {
+            $(".gohome").hide();
+            $('#downOrUpRefresh').bind({
+                scrollArea: window,
+                domUp: {
+                    domClass: 'dropload-up',
+                    domRefresh: '<div class="dropload-refresh">下拉刷新</div>',
+                    domUpdate: '<div class="dropload-update">释放刷新</div>'
+                },
+                loadUpFn: function (me) {
+                    window.location.reload(true);
+                },
+                threshold: 50
+            });
+        });
+    </script>
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight" >
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title" id="downOrUpRefresh" style="">
+                    <h5>全部成绩查询</h5>
+                    <!-- 列表表头ibox-tools的工具，隐藏，20171212 -->
+                    <!-- <div class="ibox-tools">
+                        <a class="collapse-link"> <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="close-link"> <i class="fa fa-times"></i>
+                        </a>
+                    </div> -->
+                </div>
+                <div class="ibox-content">
+                    
+<ul id="myTab" class="nav nav-tabs">
+    <li class="active"> <a href="#zxcj" data-toggle="tab">主修成绩</a> </li>
+    <li id="liFxcj"><a href="#fxcj" data-toggle="tab">辅修成绩</a></li>
+    <li id="liWzycj"><a href="#wzycj" data-toggle="tab">微专业成绩</a></li>
+</ul>
+<div id="myTabContent" class="tab-content">
+        <div class="tab-pane fade in active" id="zxcj">
+            
+            
+            
+            
+            <div class="alert alert-success" style="padding: 5px;margin-bottom: 0;" id="tips">
+                <button aria-hidden="true" data-dismiss="alert" class="close" type="button"><span
+                        class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
+                
+                <a style="color:red;text-decoration:none;display: none;" id="wpjcsfkckcj">，未评教材的学年学期成绩数据不可查</a>
+                <a style="color:red;text-decoration:none;display: none;" id="wpjcjbkc"></a>
+            </div>
+            
+                <div class="alert alert-success" style="padding: 5px;margin-bottom: 0;display: none;" id="tips2">
+                    <button aria-hidden="true" data-dismiss="alert" class="close" type="button"><span
+                            class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
+                    <a style="text-decoration:none;" id="hbutTip"></a>
+                </div>
+            
+            
+            <div class="row" style="margin: 0 !important;">
+                <div id="xsdcjcxGridIdGridQuery" class="col-sm-12">
+                    <div class="form-inline">
+                        <div class="form-group col-md-4" style="margin-bottom: 10px">
+                            <label class="control-label">起始学年学期：</label>
+                            <select name="startXnxq" class="form-control" id="startXnxq">
+                                <option value="001">入学以来</option>
+                                
+                                    <option value="2025-2026-1">2025-2026-1</option>
+                                
+                                    <option value="2024-2025-2">2024-2025-2</option>
+                                
+                                    <option value="2024-2025-1">2024-2025-1</option>
+                                
+                                    <option value="2023-2024-2">2023-2024-2</option>
+                                
+                                    <option value="2023-2024-1">2023-2024-1</option>
+                                
+                            </select>
+                        </div>
+                        <div class="form-group col-md-4" style="margin-bottom: 10px">
+                            <label class="control-label">终止学年学期：</label>
+                            <select name="endXnxq" class="form-control" id="endXnxq">
+                                <option value="001">至今</option>
+                                
+                                    <option value="2025-2026-1">2025-2026-1</option>
+                                
+                                    <option value="2024-2025-2">2024-2025-2</option>
+                                
+                                    <option value="2024-2025-1">2024-2025-1</option>
+                                
+                                    <option value="2023-2024-2">2023-2024-2</option>
+                                
+                                    <option value="2023-2024-1">2023-2024-1</option>
+                                
+                            </select>
+                        </div>
+                        <div class="form-group col-md-4" style="margin-bottom: 10px">
+                            <label class="control-label">课程名称：</label>
+                            <input class="form-control" name="kcmc"/>
+                        </div>
+                        <div class="form-group col-md-4" style="margin-bottom: 10px">
+                            <label class="control-label">是否及格：</label>
+                            <select name="sfjg" class="form-control" id="sfjg">
+                                <option value="">请选择</option>
+                                <option value="1">是</option>
+                                <option value="0">否</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label class="control-label">课程性质：</label>
+                            <select id="kcxz" name="kcxz" class="form-control" multiple>
+                                <option value="">全部</option>
+                                
+                                    <option value="44">专业必修课</option>
+                                
+                                    <option value="11">通识教育必修课</option>
+                                
+                                    <option value="12">通识教育选修课</option>
+                                
+                                    <option value="31">学科基础课</option>
+                                
+                                    <option value="40">专业核心课</option>
+                                
+                                    <option value="45">专业选修课</option>
+                                
+                                    <option value="50">基础实践</option>
+                                
+                                    <option value="51">专业实践</option>
+                                
+                                    <option value="52">综合实践</option>
+                                
+                                    <option value="53">其他实践</option>
+                                
+                                    <option value="54">短学期实践</option>
+                                
+                                    <option value="70">辅修双学位理论</option>
+                                
+                                    <option value="71">辅修双学位实践</option>
+                                
+                                    <option value="99">公共选修课</option>
+                                
+                                    <option value="32">工程基础课</option>
+                                
+                                    <option value="98">重修课</option>
+                                
+                                    <option value="43">专业基础课</option>
+                                
+                                    <option value="16">限定性选修课</option>
+                                
+                                    <option value="41">专业方向组选课</option>
+                                
+                                    <option value="42">专业任选课</option>
+                                
+                            </select>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label class="control-label">课程类型：</label>
+                            <select id="kclx" name="kclx" class="form-control">
+                                <option value="">全部</option>
+                                
+                                    <option value="7">实践课</option>
+                                
+                                    <option value="99">理论课</option>
+                                
+                            </select>
+                        </div>
+                        
+                        <div class="form-group col-md-4" style="display: none;">
+                            <label class="control-label">课程类别：</label>
+                            <select id="kclb" name="kclb" class="form-control">
+                                <option value="">全部</option>
+                                
+                                    <option value="05">通识教育必修课</option>
+                                
+                                    <option value="06">学科基础类必修课</option>
+                                
+                                    <option value="07">专业基础课</option>
+                                
+                                    <option value="08">专业必修课</option>
+                                
+                                    <option value="09">专业选修课</option>
+                                
+                                    <option value="10">通识教育选修课</option>
+                                
+                                    <option value="11">基础实践</option>
+                                
+                                    <option value="12">专业实践</option>
+                                
+                                    <option value="13">综合实践</option>
+                                
+                                    <option value="14">限定性选修课</option>
+                                
+                            </select>
+                        </div>
+                        <div class="form-group col-md-4" style="margin-bottom: 10px">
+                            <label class="control-label">课程归属：</label>
+                            <select id="kcgs" name="kcgs" class="form-control">
+                                
+                                    
+                                    
+                                        <option value="">全部</option>
+                                        
+                                            <option value="001">
+                                                    艺术美育类
+                                            </option>
+                                        
+                                            <option value="002">
+                                                    经济管理类
+                                            </option>
+                                        
+                                            <option value="003">
+                                                    工程技术类
+                                            </option>
+                                        
+                                            <option value="004">
+                                                    人文社科类
+                                            </option>
+                                        
+                                            <option value="005">
+                                                    绿色工业类
+                                            </option>
+                                        
+                                            <option value="006">
+                                                    创新创业类
+                                            </option>
+                                        
+                                            <option value="007">
+                                                    国际视野类
+                                            </option>
+                                        
+                                            <option value="008">
+                                                    科学素养类
+                                            </option>
+                                        
+                                            <option value="009">
+                                                    人文情怀类
+                                            </option>
+                                        
+                                            <option value="010">
+                                                    数智素养类
+                                            </option>
+                                        
+                                            <option value="011">
+                                                    思政类必修
+                                            </option>
+                                        
+                                    
+                                
+                            </select>
+                        </div>
+                        <div class="form-group col-md-4" style="margin-bottom: 10px">
+                            <label class="control-label">德智体美劳附加分</label>
+                            <div class="form-control" name="dztmlfjcj">
+                                <input type="number" id="dztmlfjcjzxz" name="dztmlfjcjzxz" size="1" rows="1" cols="1" class="half">
+                                <input type="number" id="dztmlfjcjzdz" name="dztmlfjcjzdz" size="1" rows="1" cols="1" class="half">
+                            </div>
+                        </div>
+                    </div>
+                    
+                        <div class="alert alert-success" style="padding: 5px;margin-bottom: 0;">
+                            <button aria-hidden="true" data-dismiss="alert" class="close" type="button"><span
+                                    class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
+                            <a style="color:red;text-decoration:none;">同学们成绩有多条记录时为学生取得该门课程的过程。绩点计算、毕业审核、成绩单打印等只会统计最高分（但补考、重修成绩等会有相应的标记）</a>
+                        </div>
+                    
+                </div>
+            </div>
+            <input id="systemParamValue" type="hidden" value="60">
+            		<div style="clear:both;"></div>
+		<div id="gqkzxsdcjcxGridId" onclick="changeQueryHightxsdcjcxGridId()" class="gqkz">
+            <div class="textspan">
+                <em class="opentit">筛选更多</em><em class="closetit">筛选收起</em>
+                <span class="fa arrow" style="float: none"></span>
+            </div>
+        </div>
+    <div>
+		<!-- 查询条件 -->
+		<!-- 工具栏 -->
+		<div class="row">
+			<div class="col-sm-12">	
+				<div class="pull-left">
+				</div>
+				<div class="pull-right">
+					      <button class="btn btn-sm btn-info" 
+					          onclick="search('xsdcjcxGridIdGrid')"
+					        ><i class="fa "></i> 搜索</button>
+                       <button class="btn btn-sm btn-info"  onclick="setting('xsdcjcxGridIdGrid')"><i class="fa"></i>设置</button>
+				</div>
+			</div>
+		</div>
+		<div class="jqGrid_wrapper uadmin-grid-margin" id="xsdcjcxGridId_wrapper">
+		        <table id="xsdcjcxGridIdGrid"></table>
+		        <div id="pager_xsdcjcxGridId"></div>
+		</div>
+	</div>
+	
+	<!-- 查询的列表 -->
+	<input type="hidden" id="queryxsdcjcxGridIdFields" name="queryxsdcjcxGridIdFields" value="id,xnxq,kcmc,xf,kcxz,kclx,ksxs,kcgs,xdxz,kclb,cjfxms,zhcj,hdxf,tscjzwmc,sfbk,cjlrjsxm,kcsx,fxcj,dztmlfjcj,">
+			 	     
+	<script type="text/javascript">
+	 	var fieldsxsdcjcxGridId = ",";
+	    $(document).ready(function () {
+	    	 $.jgrid.defaults.width = 960;
+			 $.jgrid.defaults.responsive = true;
+			 $.jgrid.defaults.styleUI = 'Bootstrap';
+			 $(".ui-jqgrid-bdiv").css("overflow-y","scroll");
+        	 $(".ui-jqgrid-bdiv").css("max-height","598px");
+        	 $("#xsdcjcxGridIdGridQuery").css("height","90px");
+        	 $("#xsdcjcxGridIdGridQuery").addClass("table_list_search_box");
+	    	 iChecks();
+	    	 fieldsxsdcjcxGridId = ",";
+	    	 getGridFieldxsdcjcxGridId();
+	    	 initxsdcjcxGridIdTable(fieldsxsdcjcxGridId);
+	    	 initxsdcjcxGridIdDate();
+	    	 <!--添加回车换行事件-->
+	    	 $(document).keydown(function(event){
+	    	 	var focus=$(':focus');
+        		if(event.keyCode ==13 && $(focus).hasClass('ui-pg-input')){
+
+            	}else if(event.keyCode ==13){
+									<!-- 权益之计 -->
+									if ("jxb2GridIdGrid" != "xsdcjcxGridIdGrid") {
+            				search("xsdcjcxGridIdGrid");
+									}
+            	}
+        	 })
+        	 var grid=$("#xsdcjcxGridIdGrid");//获取默认ID
+ 	         if(grid){
+                  let allselect = grid.jqGrid('getGridParam','allselect');
+                  if(allselect){
+                    addJqGridSelectAll('xsdcjcxGridId');
+                  }
+ 	         }
+	    });
+	    /**
+	    *初始化表单
+	    */
+		  function getGridFieldxsdcjcxGridId(){
+	    	var gridurl = "/admin/xsd/xsdcjcx/xsdQueryXscjList?fxbz=0&gridtype=jqgrid" || "defaultUrl";
+	    	if(gridurl.indexOf("?")>-1){
+	    		gridurl=gridurl.substr(0,gridurl.indexOf("?"));
+	    	}
+            // 排序的请求
+	    	$.ajax({
+	    		url:"/admin/system/gridfield/queryFieldByGridId?gridId=xsdcjcxGridIdGrid&gridurl="+gridurl,
+	    		dataType:"json",
+	    		type:"post",
+	    		async:false,
+	    		success:function(res){
+					if(res){
+					    let fieldList = res.fieldList;
+                         if(Array.isArray(fieldList) && fieldList.length > 0){
+                            for(var i=0;i<fieldList.length;i++){
+                                fieldsxsdcjcxGridId+=fieldList[i].field+",";
+                            }
+					     }
+
+
+					    var fieldsQuery = "";
+                        let fieldsQueryArr = res.quertList;
+                        if(Array.isArray(fieldsQueryArr) && fieldsQueryArr.length > 0){
+                            for(var i=0;i<fieldsQueryArr.length;i++){
+                                fieldsQuery+=fieldsQueryArr[i].field+",";
+                            }
+                            var allQuery = $("#xsdcjcxGridIdGridQuery .form-inline").children();
+
+                            // 排序完，再看是否隐藏等等
+                            for (var i = 0; i < allQuery.length; i++) {
+                                var ch = $(allQuery[i]).children();
+                                var label = $(ch[1]).attr("name");
+                                var name = $(ch[0]).text();
+                                if(name!=null&&name!=""){
+                                    if (label == null || label == "") {
+                                        label = $($(ch[1]).children()[2]).attr("name");
+                                    }
+                                    if (fieldsQuery!=null&&fieldsQuery!=''&&("," + fieldsQuery + ",").indexOf("," + label + ",") == -1) {
+                                        $(allQuery[i]).hide();
+                                    }else if(fieldsQuery!=null&&fieldsQuery!=''&&("," + fieldsQuery + ",").indexOf("," + label + ",") != -1){
+                                        $(allQuery[i]).show();
+                                    }
+                                }
+                            }
+						}
+					    let sortList = res.sortList
+                        if(Array.isArray(sortList) && sortList.length > 0){
+                            let fiedsArr = []
+                            for(var i = 0; i < sortList.length; i++){
+                                fiedsArr.push(sortList[i].field)
+                            }
+                            // 由于有些页面搜索栏中还有些其他的内容，这里选择器应该更细化，只选择出搜索项的容器
+                            var queryForms = $("#xsdcjcxGridIdGridQuery .form-inline")
+                            queryForms.each(function(){
+                                if($(this).find('.form-group').length > 0 && $(this).find('.form-group .form-control').length > 0){
+                                    var formItems = $(this).children('.form-group')
+                                    formItems.detach()
+                                    formItems.sort(function(a, b) {
+                                        let aVal = fiedsArr.indexOf($(a).find(".form-control").attr("name"));
+                                        let bVal = fiedsArr.indexOf($(b).find(".form-control").attr("name"));
+                                        if (aVal !== -1 && bVal !== -1) { // a和b都存在于str中
+                                            return aVal - bVal;
+                                        } else if (aVal !== -1) { // 只有a存在于str中
+                                            return -1;
+                                        } else if (bVal !== -1) { // 只有b存在于str中
+                                            return 1;
+                                        } else { // a和b都不存在于str中
+                                            return 0;
+                                        }
+                                    });
+                                    // 排完序 重新添加一遍
+                                    $(this).append(formItems)
+                                }
+                            })
+                        }
+					}
+                     var queryList = $("#xsdcjcxGridIdGridQuery .form-group");
+                     var queryLength = 0;
+                     for(var i=0;i<queryList.length;i++){
+                        if($(queryList[i]).css("display")!="none"){
+                            queryLength++;
+                        }
+                     }
+                     if(queryLength <= 10){
+                        $("#gqkzxsdcjcxGridId").css({'visibility':'hidden'});
+                     }
+                     if(queryLength==0){
+                       $("#xsdcjcxGridIdGridQuery").css("height","0px");
+                     }else if(queryLength<=5){
+                       $("#xsdcjcxGridIdGridQuery").css("height","55px");
+                     }else {
+                       $("#xsdcjcxGridIdGridQuery").css("height","90px");
+                     }
+	    		}
+	    	})
+	    }
+
+
+	    function initxsdcjcxGridIdTable(fields) {
+		    var queryParams = {};
+			var queryFields = $('#queryxsdcjcxGridIdFields').val();
+			queryParams['queryFields'] = queryFields;
+			
+			var colModel=[];
+            if(fields == ""||fields == ","){
+				var colIdItem={label: '主键', name: 'id', align: 'left',hidden:true,width: 100, sortable:true,
+ checkbox:true,unformat:xsdcjcxGridIdUnFormatter};
+
+					$.extend(colIdItem, {});
+					colModel.push(colIdItem);
+				var colXnxqItem={label: '学年学期', name: 'xnxq', align: 'left',width: 120, sortable:true,
+ checkbox:true,unformat:xsdcjcxGridIdUnFormatter};
+
+					$.extend(colXnxqItem, {});
+					colModel.push(colXnxqItem);
+				var colKcmcItem={label: '课程/环节', name: 'kcmc', align: 'left',width: 230, sortable:true,
+ checkbox:true,unformat:xsdcjcxGridIdUnFormatter};
+
+					$.extend(colKcmcItem, {});
+					colModel.push(colKcmcItem);
+				var colXfItem={label: '课程学分', name: 'xf', align: 'left',width: 120, sortable:true,
+ checkbox:true,unformat:xsdcjcxGridIdUnFormatter};
+
+					$.extend(colXfItem, {});
+					colModel.push(colXfItem);
+				var colKcxzItem={formatterValue: `44:专业必修课;11:通识教育必修课;12:通识教育选修课;31:学科基础课;40:专业核心课;45:专业选修课;50:基础实践;51:专业实践;52:综合实践;53:其他实践;54:短学期实践;70:辅修双学位理论;71:辅修双学位实践;99:公共选修课;90:必修;32:工程基础课;98:重修课;43:专业基础课;16:限定性选修课;41:专业方向组选课;42:专业任选课`,dict: 'ZD_KCXZ',label: '课程性质', name: 'kcxz', align: 'left',formatter:xsdcjcxGridIdKcxzFormatter,width: 120, sortable:true,
+ checkbox:true,unformat:xsdcjcxGridIdUnFormatter};
+
+					$.extend(colKcxzItem, {});
+					colModel.push(colKcxzItem);
+				var colKclxItem={formatterValue: `98:学分认定;11:军训;12:毕业（设计）论文;13:实习;14:教育实习;21:教学实习;22:课程设计;19:短学期实践;15:专业基础课;9:综合实践;8:专业实践;7:实践课;6:通识选修课;4:专业选修课;3:专业必修课;2:专业核心课;1:学科基础课;10:通识教育必修课;99:理论课;50:毕业教育;23:生产实践;24:入学教育`,dict: 'ZD_KCLX',label: '课程类型', name: 'kclx', align: 'left',formatter:xsdcjcxGridIdKclxFormatter,width: 120, sortable:true,
+ checkbox:true,unformat:xsdcjcxGridIdUnFormatter};
+
+					$.extend(colKclxItem, {});
+					colModel.push(colKclxItem);
+				var colKsxsItem={formatterValue: `2:考查;1:考试;11:一类考试;22:二类考试;333:三类考试`,dict: 'ZD_KSXS',label: '考试形式', name: 'ksxs', align: 'left',formatter:xsdcjcxGridIdKsxsFormatter,width: 120, sortable:true,
+ checkbox:true,unformat:xsdcjcxGridIdUnFormatter};
+
+					$.extend(colKsxsItem, {});
+					colModel.push(colKsxsItem);
+				var colKcgsItem={formatterValue: `2:语言类;9:其他类;5:实践类;1:理论类;6:艺术类;3:实验（实训）类;4:体育类;001:艺术美育类;002:经济管理类;003:工程技术类;004:人文社科类;005:绿色工业类;006:创新创业类;007:国际视野类;008:科学素养类;009:人文情怀类;010:数智素养类;011:思政类必修`,dict: 'ZD_KCGS',label: '课程归属', name: 'kcgs', align: 'left',formatter:xsdcjcxGridIdKcgsFormatter,width: 120, sortable:true,
+ checkbox:true,unformat:xsdcjcxGridIdUnFormatter};
+
+					$.extend(colKcgsItem, {});
+					colModel.push(colKcgsItem);
+				var colXdxzItem={formatterValue: `1:初修;2:重修`,dict: 'ZD_XDXZ',label: '修读性质 ', name: 'xdxz', align: 'left',formatter:xsdcjcxGridIdXdxzFormatter,width: 120, sortable:true,
+ checkbox:true,unformat:xsdcjcxGridIdUnFormatter};
+
+					$.extend(colXdxzItem, {});
+					colModel.push(colXdxzItem);
+				var colKclbItem={formatterValue: `01:公共基础课;02:学科基础课;03:专业课;4:通识选修课;05:通识教育必修课;06:学科基础类必修课;07:专业基础课;08:专业必修课;09:专业选修课;10:通识教育选修课;11:基础实践;12:专业实践;13:综合实践;14:限定性选修课`,dict: 'ZD_KCLB',label: '课程类别', name: 'kclb', align: 'left',formatter:xsdcjcxGridIdKclbFormatter,width: 120, sortable:true,
+ checkbox:true,unformat:xsdcjcxGridIdUnFormatter};
+
+					$.extend(colKclbItem, {});
+					colModel.push(colKclbItem);
+				var colCjfxmsItem={label: '成绩分项描述', name: 'cjfxms', align: 'left',width: 120, sortable:true,
+ checkbox:true,unformat:xsdcjcxGridIdUnFormatter};
+
+					$.extend(colCjfxmsItem, {});
+					colModel.push(colCjfxmsItem);
+				var colZhcjItem={label: '综合成绩', name: 'zhcj', align: 'left',width: 120, sortable:true,
+ checkbox:true,unformat:xsdcjcxGridIdUnFormatter};
+
+					$.extend(colZhcjItem, {});
+					colModel.push(colZhcjItem);
+				var colHdxfItem={label: '获得学分', name: 'hdxf', align: 'left',width: 120, sortable:true,
+ checkbox:true,unformat:xsdcjcxGridIdUnFormatter};
+
+					$.extend(colHdxfItem, {});
+					colModel.push(colHdxfItem);
+				var colTscjzwmcItem={label: '特殊成绩标识', name: 'tscjzwmc', align: 'left',width: 120, sortable:true,
+ checkbox:true,unformat:xsdcjcxGridIdUnFormatter};
+
+					$.extend(colTscjzwmcItem, {});
+					colModel.push(colTscjzwmcItem);
+				var colSfbkItem={formatterValue: `0:正考;1:补考;2:缓考补考`,dict: 'ZD_CJBKLX',label: '是否补考 ', name: 'sfbk', align: 'left',formatter:xsdcjcxGridIdSfbkFormatter,width: 120, sortable:true,
+ checkbox:true,unformat:xsdcjcxGridIdUnFormatter};
+
+					$.extend(colSfbkItem, {});
+					colModel.push(colSfbkItem);
+				var colCjlrjsxmItem={label: '成绩录入教师', name: 'cjlrjsxm', align: 'left',width: 120, sortable:true,
+ checkbox:true,unformat:xsdcjcxGridIdUnFormatter};
+
+					$.extend(colCjlrjsxmItem, {});
+					colModel.push(colCjlrjsxmItem);
+				var colKcsxItem={formatterValue: `1:必修;2:限选;3:任选;4:辅修;21:选修;7:双选;8:通选;9:其他;6:双必;5:实践`,dict: 'ZD_KCSX',label: '课程属性 ', name: 'kcsx', align: 'left',formatter:xsdcjcxGridIdKcsxFormatter,width: 120, sortable:true,
+ checkbox:true,unformat:xsdcjcxGridIdUnFormatter};
+
+					$.extend(colKcsxItem, {});
+					colModel.push(colKcsxItem);
+				var colFxcjItem={label: '分项成绩', name: 'fxcj', align: 'left',width: 120, sortable:true,
+ checkbox:true,unformat:xsdcjcxGridIdUnFormatter};
+
+					$.extend(colFxcjItem, {});
+					colModel.push(colFxcjItem);
+				var colDztmlfjcjItem={label: '德智体美劳附加分', name: 'dztmlfjcj', align: 'left',hidden:true,width: 120, sortable:true,
+ checkbox:true,unformat:xsdcjcxGridIdUnFormatter};
+
+					$.extend(colDztmlfjcjItem, {});
+					colModel.push(colDztmlfjcjItem);
+
+			}
+			else{
+				var array = fields.split(",");
+				for(var i = 0; i < array.length; i++){
+					if(array[i] != null && array[i] != ""){
+							if(array[i] == "id"){
+							 var colIdItem={label: '主键', name: 'id', align: 'left',width: 100, sortable:true,
+ checkbox:true,unformat:xsdcjcxGridIdUnFormatter};
+
+								$.extend(colIdItem, {});
+
+								colModel.push(colIdItem);
+
+							}
+
+							if(array[i] == "xnxq"){
+							 var colXnxqItem={label: '学年学期', name: 'xnxq', align: 'left',width: 120, sortable:true,
+ checkbox:true,unformat:xsdcjcxGridIdUnFormatter};
+
+								$.extend(colXnxqItem, {});
+
+								colModel.push(colXnxqItem);
+
+							}
+
+							if(array[i] == "kcmc"){
+							 var colKcmcItem={label: '课程/环节', name: 'kcmc', align: 'left',width: 230, sortable:true,
+ checkbox:true,unformat:xsdcjcxGridIdUnFormatter};
+
+								$.extend(colKcmcItem, {});
+
+								colModel.push(colKcmcItem);
+
+							}
+
+							if(array[i] == "xf"){
+							 var colXfItem={label: '课程学分', name: 'xf', align: 'left',width: 120, sortable:true,
+ checkbox:true,unformat:xsdcjcxGridIdUnFormatter};
+
+								$.extend(colXfItem, {});
+
+								colModel.push(colXfItem);
+
+							}
+
+							if(array[i] == "kcxz"){
+							 var colKcxzItem={formatterValue: `44:专业必修课;11:通识教育必修课;12:通识教育选修课;31:学科基础课;40:专业核心课;45:专业选修课;50:基础实践;51:专业实践;52:综合实践;53:其他实践;54:短学期实践;70:辅修双学位理论;71:辅修双学位实践;99:公共选修课;90:必修;32:工程基础课;98:重修课;43:专业基础课;16:限定性选修课;41:专业方向组选课;42:专业任选课`,dict: 'ZD_KCXZ',label: '课程性质', name: 'kcxz', align: 'left',formatter:xsdcjcxGridIdKcxzFormatter,width: 120, sortable:true,
+ checkbox:true,unformat:xsdcjcxGridIdUnFormatter};
+
+								$.extend(colKcxzItem, {});
+
+								colModel.push(colKcxzItem);
+
+							}
+
+							if(array[i] == "kclx"){
+							 var colKclxItem={formatterValue: `98:学分认定;11:军训;12:毕业（设计）论文;13:实习;14:教育实习;21:教学实习;22:课程设计;19:短学期实践;15:专业基础课;9:综合实践;8:专业实践;7:实践课;6:通识选修课;4:专业选修课;3:专业必修课;2:专业核心课;1:学科基础课;10:通识教育必修课;99:理论课;50:毕业教育;23:生产实践;24:入学教育`,dict: 'ZD_KCLX',label: '课程类型', name: 'kclx', align: 'left',formatter:xsdcjcxGridIdKclxFormatter,width: 120, sortable:true,
+ checkbox:true,unformat:xsdcjcxGridIdUnFormatter};
+
+								$.extend(colKclxItem, {});
+
+								colModel.push(colKclxItem);
+
+							}
+
+							if(array[i] == "ksxs"){
+							 var colKsxsItem={formatterValue: `2:考查;1:考试;11:一类考试;22:二类考试;333:三类考试`,dict: 'ZD_KSXS',label: '考试形式', name: 'ksxs', align: 'left',formatter:xsdcjcxGridIdKsxsFormatter,width: 120, sortable:true,
+ checkbox:true,unformat:xsdcjcxGridIdUnFormatter};
+
+								$.extend(colKsxsItem, {});
+
+								colModel.push(colKsxsItem);
+
+							}
+
+							if(array[i] == "kcgs"){
+							 var colKcgsItem={formatterValue: `2:语言类;9:其他类;5:实践类;1:理论类;6:艺术类;3:实验（实训）类;4:体育类;001:艺术美育类;002:经济管理类;003:工程技术类;004:人文社科类;005:绿色工业类;006:创新创业类;007:国际视野类;008:科学素养类;009:人文情怀类;010:数智素养类;011:思政类必修`,dict: 'ZD_KCGS',label: '课程归属', name: 'kcgs', align: 'left',formatter:xsdcjcxGridIdKcgsFormatter,width: 120, sortable:true,
+ checkbox:true,unformat:xsdcjcxGridIdUnFormatter};
+
+								$.extend(colKcgsItem, {});
+
+								colModel.push(colKcgsItem);
+
+							}
+
+							if(array[i] == "xdxz"){
+							 var colXdxzItem={formatterValue: `1:初修;2:重修`,dict: 'ZD_XDXZ',label: '修读性质 ', name: 'xdxz', align: 'left',formatter:xsdcjcxGridIdXdxzFormatter,width: 120, sortable:true,
+ checkbox:true,unformat:xsdcjcxGridIdUnFormatter};
+
+								$.extend(colXdxzItem, {});
+
+								colModel.push(colXdxzItem);
+
+							}
+
+							if(array[i] == "kclb"){
+							 var colKclbItem={formatterValue: `01:公共基础课;02:学科基础课;03:专业课;4:通识选修课;05:通识教育必修课;06:学科基础类必修课;07:专业基础课;08:专业必修课;09:专业选修课;10:通识教育选修课;11:基础实践;12:专业实践;13:综合实践;14:限定性选修课`,dict: 'ZD_KCLB',label: '课程类别', name: 'kclb', align: 'left',formatter:xsdcjcxGridIdKclbFormatter,width: 120, sortable:true,
+ checkbox:true,unformat:xsdcjcxGridIdUnFormatter};
+
+								$.extend(colKclbItem, {});
+
+								colModel.push(colKclbItem);
+
+							}
+
+							if(array[i] == "cjfxms"){
+							 var colCjfxmsItem={label: '成绩分项描述', name: 'cjfxms', align: 'left',width: 120, sortable:true,
+ checkbox:true,unformat:xsdcjcxGridIdUnFormatter};
+
+								$.extend(colCjfxmsItem, {});
+
+								colModel.push(colCjfxmsItem);
+
+							}
+
+							if(array[i] == "zhcj"){
+							 var colZhcjItem={label: '综合成绩', name: 'zhcj', align: 'left',width: 120, sortable:true,
+ checkbox:true,unformat:xsdcjcxGridIdUnFormatter};
+
+								$.extend(colZhcjItem, {});
+
+								colModel.push(colZhcjItem);
+
+							}
+
+							if(array[i] == "hdxf"){
+							 var colHdxfItem={label: '获得学分', name: 'hdxf', align: 'left',width: 120, sortable:true,
+ checkbox:true,unformat:xsdcjcxGridIdUnFormatter};
+
+								$.extend(colHdxfItem, {});
+
+								colModel.push(colHdxfItem);
+
+							}
+
+							if(array[i] == "tscjzwmc"){
+							 var colTscjzwmcItem={label: '特殊成绩标识', name: 'tscjzwmc', align: 'left',width: 120, sortable:true,
+ checkbox:true,unformat:xsdcjcxGridIdUnFormatter};
+
+								$.extend(colTscjzwmcItem, {});
+
+								colModel.push(colTscjzwmcItem);
+
+							}
+
+							if(array[i] == "sfbk"){
+							 var colSfbkItem={formatterValue: `0:正考;1:补考;2:缓考补考`,dict: 'ZD_CJBKLX',label: '是否补考 ', name: 'sfbk', align: 'left',formatter:xsdcjcxGridIdSfbkFormatter,width: 120, sortable:true,
+ checkbox:true,unformat:xsdcjcxGridIdUnFormatter};
+
+								$.extend(colSfbkItem, {});
+
+								colModel.push(colSfbkItem);
+
+							}
+
+							if(array[i] == "cjlrjsxm"){
+							 var colCjlrjsxmItem={label: '成绩录入教师', name: 'cjlrjsxm', align: 'left',width: 120, sortable:true,
+ checkbox:true,unformat:xsdcjcxGridIdUnFormatter};
+
+								$.extend(colCjlrjsxmItem, {});
+
+								colModel.push(colCjlrjsxmItem);
+
+							}
+
+							if(array[i] == "kcsx"){
+							 var colKcsxItem={formatterValue: `1:必修;2:限选;3:任选;4:辅修;21:选修;7:双选;8:通选;9:其他;6:双必;5:实践`,dict: 'ZD_KCSX',label: '课程属性 ', name: 'kcsx', align: 'left',formatter:xsdcjcxGridIdKcsxFormatter,width: 120, sortable:true,
+ checkbox:true,unformat:xsdcjcxGridIdUnFormatter};
+
+								$.extend(colKcsxItem, {});
+
+								colModel.push(colKcsxItem);
+
+							}
+
+							if(array[i] == "fxcj"){
+							 var colFxcjItem={label: '分项成绩', name: 'fxcj', align: 'left',width: 120, sortable:true,
+ checkbox:true,unformat:xsdcjcxGridIdUnFormatter};
+
+								$.extend(colFxcjItem, {});
+
+								colModel.push(colFxcjItem);
+
+							}
+
+							if(array[i] == "dztmlfjcj"){
+							 var colDztmlfjcjItem={label: '德智体美劳附加分', name: 'dztmlfjcj', align: 'left',width: 120, sortable:true,
+ checkbox:true,unformat:xsdcjcxGridIdUnFormatter};
+
+								$.extend(colDztmlfjcjItem, {});
+
+								colModel.push(colDztmlfjcjItem);
+
+							}
+
+					}
+				}
+				var colIdItem;
+
+				if(fields.indexOf("," + "id" + ",") == -1){
+					colIdItem={label: '主键', name: 'id',  align: 'left',hidden:true,width: 100, sortable:true,
+ checkbox:true,unformat:xsdcjcxGridIdUnFormatter};
+
+
+					$.extend(colIdItem, {});
+					colModel.push(colIdItem);
+				}
+
+				var colXnxqItem;
+
+				if(fields.indexOf("," + "xnxq" + ",") == -1){
+					colXnxqItem={label: '学年学期', name: 'xnxq',  align: 'left',hidden:true,width: 120, sortable:true,
+ checkbox:true,unformat:xsdcjcxGridIdUnFormatter};
+
+
+					$.extend(colXnxqItem, {});
+					colModel.push(colXnxqItem);
+				}
+
+				var colKcmcItem;
+
+				if(fields.indexOf("," + "kcmc" + ",") == -1){
+					colKcmcItem={label: '课程/环节', name: 'kcmc',  align: 'left',hidden:true,width: 230, sortable:true,
+ checkbox:true,unformat:xsdcjcxGridIdUnFormatter};
+
+
+					$.extend(colKcmcItem, {});
+					colModel.push(colKcmcItem);
+				}
+
+				var colXfItem;
+
+				if(fields.indexOf("," + "xf" + ",") == -1){
+					colXfItem={label: '课程学分', name: 'xf',  align: 'left',hidden:true,width: 120, sortable:true,
+ checkbox:true,unformat:xsdcjcxGridIdUnFormatter};
+
+
+					$.extend(colXfItem, {});
+					colModel.push(colXfItem);
+				}
+
+				var colKcxzItem;
+
+				if(fields.indexOf("," + "kcxz" + ",") == -1){
+					colKcxzItem={formatterValue: `44:专业必修课;11:通识教育必修课;12:通识教育选修课;31:学科基础课;40:专业核心课;45:专业选修课;50:基础实践;51:专业实践;52:综合实践;53:其他实践;54:短学期实践;70:辅修双学位理论;71:辅修双学位实践;99:公共选修课;90:必修;32:工程基础课;98:重修课;43:专业基础课;16:限定性选修课;41:专业方向组选课;42:专业任选课`,dict: 'ZD_KCXZ',label: '课程性质', name: 'kcxz',  align: 'left',hidden:true,formatter:xsdcjcxGridIdKcxzFormatter,width: 120, sortable:true,
+ checkbox:true,unformat:xsdcjcxGridIdUnFormatter};
+
+
+					$.extend(colKcxzItem, {});
+					colModel.push(colKcxzItem);
+				}
+
+				var colKclxItem;
+
+				if(fields.indexOf("," + "kclx" + ",") == -1){
+					colKclxItem={formatterValue: `98:学分认定;11:军训;12:毕业（设计）论文;13:实习;14:教育实习;21:教学实习;22:课程设计;19:短学期实践;15:专业基础课;9:综合实践;8:专业实践;7:实践课;6:通识选修课;4:专业选修课;3:专业必修课;2:专业核心课;1:学科基础课;10:通识教育必修课;99:理论课;50:毕业教育;23:生产实践;24:入学教育`,dict: 'ZD_KCLX',label: '课程类型', name: 'kclx',  align: 'left',hidden:true,formatter:xsdcjcxGridIdKclxFormatter,width: 120, sortable:true,
+ checkbox:true,unformat:xsdcjcxGridIdUnFormatter};
+
+
+					$.extend(colKclxItem, {});
+					colModel.push(colKclxItem);
+				}
+
+				var colKsxsItem;
+
+				if(fields.indexOf("," + "ksxs" + ",") == -1){
+					colKsxsItem={formatterValue: `2:考查;1:考试;11:一类考试;22:二类考试;333:三类考试`,dict: 'ZD_KSXS',label: '考试形式', name: 'ksxs',  align: 'left',hidden:true,formatter:xsdcjcxGridIdKsxsFormatter,width: 120, sortable:true,
+ checkbox:true,unformat:xsdcjcxGridIdUnFormatter};
+
+
+					$.extend(colKsxsItem, {});
+					colModel.push(colKsxsItem);
+				}
+
+				var colKcgsItem;
+
+				if(fields.indexOf("," + "kcgs" + ",") == -1){
+					colKcgsItem={formatterValue: `2:语言类;9:其他类;5:实践类;1:理论类;6:艺术类;3:实验（实训）类;4:体育类;001:艺术美育类;002:经济管理类;003:工程技术类;004:人文社科类;005:绿色工业类;006:创新创业类;007:国际视野类;008:科学素养类;009:人文情怀类;010:数智素养类;011:思政类必修`,dict: 'ZD_KCGS',label: '课程归属', name: 'kcgs',  align: 'left',hidden:true,formatter:xsdcjcxGridIdKcgsFormatter,width: 120, sortable:true,
+ checkbox:true,unformat:xsdcjcxGridIdUnFormatter};
+
+
+					$.extend(colKcgsItem, {});
+					colModel.push(colKcgsItem);
+				}
+
+				var colXdxzItem;
+
+				if(fields.indexOf("," + "xdxz" + ",") == -1){
+					colXdxzItem={formatterValue: `1:初修;2:重修`,dict: 'ZD_XDXZ',label: '修读性质 ', name: 'xdxz',  align: 'left',hidden:true,formatter:xsdcjcxGridIdXdxzFormatter,width: 120, sortable:true,
+ checkbox:true,unformat:xsdcjcxGridIdUnFormatter};
+
+
+					$.extend(colXdxzItem, {});
+					colModel.push(colXdxzItem);
+				}
+
+				var colKclbItem;
+
+				if(fields.indexOf("," + "kclb" + ",") == -1){
+					colKclbItem={formatterValue: `01:公共基础课;02:学科基础课;03:专业课;4:通识选修课;05:通识教育必修课;06:学科基础类必修课;07:专业基础课;08:专业必修课;09:专业选修课;10:通识教育选修课;11:基础实践;12:专业实践;13:综合实践;14:限定性选修课`,dict: 'ZD_KCLB',label: '课程类别', name: 'kclb',  align: 'left',hidden:true,formatter:xsdcjcxGridIdKclbFormatter,width: 120, sortable:true,
+ checkbox:true,unformat:xsdcjcxGridIdUnFormatter};
+
+
+					$.extend(colKclbItem, {});
+					colModel.push(colKclbItem);
+				}
+
+				var colCjfxmsItem;
+
+				if(fields.indexOf("," + "cjfxms" + ",") == -1){
+					colCjfxmsItem={label: '成绩分项描述', name: 'cjfxms',  align: 'left',hidden:true,width: 120, sortable:true,
+ checkbox:true,unformat:xsdcjcxGridIdUnFormatter};
+
+
+					$.extend(colCjfxmsItem, {});
+					colModel.push(colCjfxmsItem);
+				}
+
+				var colZhcjItem;
+
+				if(fields.indexOf("," + "zhcj" + ",") == -1){
+					colZhcjItem={label: '综合成绩', name: 'zhcj',  align: 'left',hidden:true,width: 120, sortable:true,
+ checkbox:true,unformat:xsdcjcxGridIdUnFormatter};
+
+
+					$.extend(colZhcjItem, {});
+					colModel.push(colZhcjItem);
+				}
+
+				var colHdxfItem;
+
+				if(fields.indexOf("," + "hdxf" + ",") == -1){
+					colHdxfItem={label: '获得学分', name: 'hdxf',  align: 'left',hidden:true,width: 120, sortable:true,
+ checkbox:true,unformat:xsdcjcxGridIdUnFormatter};
+
+
+					$.extend(colHdxfItem, {});
+					colModel.push(colHdxfItem);
+				}
+
+				var colTscjzwmcItem;
+
+				if(fields.indexOf("," + "tscjzwmc" + ",") == -1){
+					colTscjzwmcItem={label: '特殊成绩标识', name: 'tscjzwmc',  align: 'left',hidden:true,width: 120, sortable:true,
+ checkbox:true,unformat:xsdcjcxGridIdUnFormatter};
+
+
+					$.extend(colTscjzwmcItem, {});
+					colModel.push(colTscjzwmcItem);
+				}
+
+				var colSfbkItem;
+
+				if(fields.indexOf("," + "sfbk" + ",") == -1){
+					colSfbkItem={formatterValue: `0:正考;1:补考;2:缓考补考`,dict: 'ZD_CJBKLX',label: '是否补考 ', name: 'sfbk',  align: 'left',hidden:true,formatter:xsdcjcxGridIdSfbkFormatter,width: 120, sortable:true,
+ checkbox:true,unformat:xsdcjcxGridIdUnFormatter};
+
+
+					$.extend(colSfbkItem, {});
+					colModel.push(colSfbkItem);
+				}
+
+				var colCjlrjsxmItem;
+
+				if(fields.indexOf("," + "cjlrjsxm" + ",") == -1){
+					colCjlrjsxmItem={label: '成绩录入教师', name: 'cjlrjsxm',  align: 'left',hidden:true,width: 120, sortable:true,
+ checkbox:true,unformat:xsdcjcxGridIdUnFormatter};
+
+
+					$.extend(colCjlrjsxmItem, {});
+					colModel.push(colCjlrjsxmItem);
+				}
+
+				var colKcsxItem;
+
+				if(fields.indexOf("," + "kcsx" + ",") == -1){
+					colKcsxItem={formatterValue: `1:必修;2:限选;3:任选;4:辅修;21:选修;7:双选;8:通选;9:其他;6:双必;5:实践`,dict: 'ZD_KCSX',label: '课程属性 ', name: 'kcsx',  align: 'left',hidden:true,formatter:xsdcjcxGridIdKcsxFormatter,width: 120, sortable:true,
+ checkbox:true,unformat:xsdcjcxGridIdUnFormatter};
+
+
+					$.extend(colKcsxItem, {});
+					colModel.push(colKcsxItem);
+				}
+
+				var colFxcjItem;
+
+				if(fields.indexOf("," + "fxcj" + ",") == -1){
+					colFxcjItem={label: '分项成绩', name: 'fxcj',  align: 'left',hidden:true,width: 120, sortable:true,
+ checkbox:true,unformat:xsdcjcxGridIdUnFormatter};
+
+
+					$.extend(colFxcjItem, {});
+					colModel.push(colFxcjItem);
+				}
+
+				var colDztmlfjcjItem;
+
+				if(fields.indexOf("," + "dztmlfjcj" + ",") == -1){
+					colDztmlfjcjItem={label: '德智体美劳附加分', name: 'dztmlfjcj',  align: 'left',hidden:true,width: 120, sortable:true,
+ checkbox:true,unformat:xsdcjcxGridIdUnFormatter};
+
+
+					$.extend(colDztmlfjcjItem, {});
+					colModel.push(colDztmlfjcjItem);
+				}
+
+			}
+            
+			var settings={
+                postData: queryParams,
+                styleUI : 'Bootstrap',
+			    mtype: "get",
+			    url: "/admin/xsd/xsdcjcx/xsdQueryXscjList?fxbz=0&gridtype=jqgrid",
+			    prmNames:{//请求参数格式预处理
+			          page:"page.pn",
+			          rows:"page.size", 
+			          sort:"sort",
+			          order: "order"
+			    },
+                rowNum: 20,
+                datatype: "lazy",
+                colModel:colModel,
+			    pageable: true,
+			    page: 1,
+                rowNum: 20,
+                pager: "#pager_xsdcjcxGridId",
+                multiSort: true,
+			    sortable: true,
+			    sortname: "",
+			    defaultsort:"xnxq",
+			    sortorder: "desc",
+			    multiselect: false,
+			    allselect: false,
+			    //width: auto,
+			    height: 'auto',
+			    shrinkToFit: false,
+				loadComplete:function () {
+				 	$("#xsdcjcxGridIdGrid td a").on('click',function(event){
+        				event.stopPropagation();
+    				});
+					if("axzbsycjcxGridId"=="xsdcjcxGridId"){
+						var ids = $("#xsdcjcxGridIdGrid").jqGrid("getRowData");
+						var bjg=$("#systemParamValue").val();
+						var cj=60;
+						if(bjg!=null&&bjg!=''&&bjg!=undefined){
+							cj=Number(bjg);
+						}
+						for(var i=0;i<ids.length;i++){
+							if(ids[i].zhcj1<cj){
+								$("#"+ids[i].id).css("color","red");
+							}
+							if(ids[i].sjly=='0'&&ids[i].zhcj1!=null&& parseFloat(ids[i].zhcj1) < 1&& parseFloat(ids[i].zhcj1) > 0){
+								$("#xsdcjcxGridIdGrid").jqGrid("setCell",ids[i].id,"zhcj",'0'+ids[i].zhcj1);
+							}
+							if(ids[i].sjly=='0'&&ids[i].yscj!=null&& parseFloat(ids[i].yscj) < 1&& parseFloat(ids[i].yscj) > 0){
+								$("#xsdcjcxGridIdGrid").jqGrid("setCell",ids[i].id,"yscj",'0'+ids[i].yscj);
+							}
+						}
+					}
+					if("cjxgsqGridId"=="xsdcjcxGridId"){
+					    var ids = $("#xsdcjcxGridIdGrid").jqGrid("getRowData");
+						var bjg=$("#systemParamValue").val();
+						var cj=60;
+						if(bjg!=null&&bjg!=''&&bjg!=undefined){
+							cj=Number(bjg);
+						}
+						for(var i=0;i<ids.length;i++){
+							if(ids[i].zhcj<cj){
+								$("#"+ids[i].id).css("color","red");
+							}
+						}
+					}
+					if("axzbzgcjcxGridId"=="xsdcjcxGridId"){
+						var ids = $("#xsdcjcxGridIdGrid").jqGrid("getRowData");
+						var bjg=$("#systemParamValue").val();
+						var cj=60;
+						if(bjg!=null&&bjg!=''&&bjg!=undefined){
+							cj=Number(bjg);
+						}
+						for(var i=0;i<ids.length;i++){
+							if(ids[i].zhcj!=null&&ids[i].zhcj!="无"&&ids[i].zhcj!="缺考"){
+							if(ids[i].zhcj1<cj){
+								$("#"+ids[i].id).css("color","red");
+							}
+							if(ids[i].zhcj1>=cj&&ids[i].xdxz=="2"){
+								$("#"+ids[i].id).css("color","blue");
+							}
+							if(ids[i].zhcj1>=cj&&ids[i].sfbk=="1"){
+								$("#"+ids[i].id).css("color","green");
+							}
+							}else{
+							if(ids[i].zhcj1<cj){
+								$("#"+ids[i].id).css("color","red");
+							}
+								if(ids[i].zhcj1>=cj&&ids[i].xdxz=="2"){
+								$("#"+ids[i].id).css("color","blue");
+							}
+							if(ids[i].zhcj1>=cj&&ids[i].sfbk=="1"){
+								$("#"+ids[i].id).css("color","green");
+							}
+							}
+
+						}
+					}
+					if("xsdcjcxGridId"=="xsdcjcxGridId"){
+						var ids = $("#xsdcjcxGridIdGrid").jqGrid("getRowData");
+						var bjg=$("#systemParamValue").val();
+						var cj=60;
+						if(bjg!=null&&bjg!=''&&bjg!=undefined){
+							cj=Number(bjg);
+						}
+						for(var i=0;i<ids.length;i++){
+							if(ids[i].xdxz==2){
+								$("#"+ids[i].id).css("color","goldenrod");
+							}
+							if(ids[i].zhcj1<cj){
+								$("#"+ids[i].id).css("color","red");
+							}
+								if(ids[i].zhcj>cj&&ids[i].xdxz==2){
+								$("#"+ids[i].id).css("color","blue");
+							}
+							if(ids[i].zhcj>cj&&ids[i].sfbk==1){
+								$("#"+ids[i].id).css("color","green");
+							}
+						}
+					}
+					if("cjxgsq"=="xsdcjcxGridId"){
+						var ids = $("#xsdcjcxGridIdGrid").jqGrid("getRowData");
+						var bjg=$("#systemParamValue").val();
+						var cj=60;
+						if(bjg!=null&&bjg!=''&&bjg!=undefined){
+							cj=Number(bjg);
+						}
+						for(var i=0;i<ids.length;i++){
+							if(ids[i].zhcj<cj){
+								$("#"+ids[i].id).css("color","red");
+							}
+						}
+					}
+					if("xssqGridId"=="xsdcjcxGridId"){
+						var ids = $("#xsdcjcxGridIdGrid").jqGrid("getRowData");
+						for(var i=0;i<ids.length;i++){
+							if(ids[i].sqzt=='1'){
+								$("#"+ids[i].id).css("color","red");
+							}
+						}
+					}
+					if("ybyxsmd_20210625ljk001"=="xsdcjcxGridId"){
+						var ids = $("#xsdcjcxGridIdGrid").jqGrid("getRowData");
+						for(var i=0;i<ids.length;i++){
+							if(ids[i].topflag=='1'){
+								$("#"+ids[i].id).css("color","red");
+							}
+						}
+					}
+					if("axzbsycjcxGridId"=="xsdcjcxGridId"){
+						var ids = $("#xsdcjcxGridIdGrid").jqGrid("getRowData");
+						var bjg=$("#systemParamValue").val();
+						var cj=60;
+						if(bjg!=null&&bjg!=''&&bjg!=undefined){
+							cj=Number(bjg);
+						}
+						for(var i=0;i<ids.length;i++){
+							if(ids[i].zhcj1<cj){
+								$("#"+ids[i].id).css("color","red");
+							}
+								if(ids[i].zhcj1>=cj&&ids[i].xdxz=="2"){
+								$("#"+ids[i].id).css("color","blue");
+							}
+							if(ids[i].zhcj1>=cj&&ids[i].sfbk=="1"){
+								$("#"+ids[i].id).css("color","green");
+							}
+						}
+					}
+					if("axhcjscGridId"=="xsdcjcxGridId"){
+						var ids = $("#xsdcjcxGridIdGrid").jqGrid("getRowData");
+						var bjg=$("#systemParamValue").val();
+						var cj=60;
+						if(bjg!=null&&bjg!=''&&bjg!=undefined){
+							cj=Number(bjg);
+						}
+						for(var i=0;i<ids.length;i++){
+							if(ids[i].zhcj1<cj){
+								$("#"+ids[i].id).css("color","red");
+							}
+								if(ids[i].zhcj>cj&&ids[i].xdxz==2){
+								$("#"+ids[i].id).css("color","blue");
+							}
+							if(ids[i].zhcj>cj&&ids[i].sfbk==1){
+								$("#"+ids[i].id).css("color","green");
+							}
+						}
+					}
+					if("axhcjxgGridId"=="xsdcjcxGridId"){
+						var ids = $("#xsdcjcxGridIdGrid").jqGrid("getRowData");
+						var bjg=$("#systemParamValue").val();
+						var cj=60;
+						if(bjg!=null&&bjg!=''&&bjg!=undefined){
+							cj=Number(bjg);
+						}
+						for(var i=0;i<ids.length;i++){
+						//研发没时间加参数zhcj1，故先把zhcj1修改为zhcj
+							if(ids[i].zhcj1<cj){
+								$("#"+ids[i].id).css("color","red");
+							}
+								if(ids[i].zhcj1>=cj&&ids[i].xdxz==2){
+								$("#"+ids[i].id).css("color","blue");
+							}
+							if(ids[i].zhcj1>=cj&&ids[i].sfbk==1){
+								$("#"+ids[i].id).css("color","green");
+							}
+						}
+					}
+
+					if("tsxszhcjxgGridId"=="xsdcjcxGridId"){
+						var ids = $("#xsdcjcxGridIdGrid").jqGrid("getRowData");
+						// bjg不及格分数线
+						var bjg=$("#systemParamValue").val();
+						var cj=60;
+						if(bjg!=null&&bjg!=''&&bjg!=undefined){
+							cj=Number(bjg);
+						}
+						for(var i=0;i<ids.length;i++){
+							if(ids[i].zhcj1<cj){
+								$("#"+ids[i].id).css("color","red");
+							}
+							// xdxz修读性质为2重修
+								if(ids[i].zhcj1>=cj&&ids[i].xdxz==2){
+								$("#"+ids[i].id).css("color","blue");
+							}
+							// sfbk是否补考 1为是
+							if(ids[i].zhcj1>=cj&&ids[i].sfbk==1){
+								$("#"+ids[i].id).css("color","green");
+							}
+						}
+					}
+                    var transMap =  JSON.parse(sessionStorage.getItem('getTranslation_transMap'));
+                    if(!transMap){
+                    	var yysz = getCookie("yysz");
+                        $.ajax({
+                            type: "GET",
+                            url:  "/admin/system/gridfield/getTranslation",
+                            dataType: "json",
+                            data:{
+                               yysz:yysz
+                            },
+                            async: true,
+                            success: function (data) {
+                                if(data.ret!=-1){
+                                    transMap = data.extend.transMap;
+                                    if (transMap == null || transMap.length == 0) {
+                                        sessionStorage.setItem('getTranslation_transMap', "{}")
+                                        return;
+                                    }
+                                    sessionStorage.setItem('getTranslation_transMap', JSON.stringify(transMap));
+                                    translationAllHtml(transMap,document.children);
+                                }
+                            }
+                        });
+                    }else{
+                          translationAllHtml(transMap,document.children);
+                    }
+				},
+			    jsonReader: {//返回参数格式处理
+			        root: "results",
+			        page: "page",
+			        total: "totalPages",
+			        records: "total"
+			    },
+			    rownumbers: false,
+			    multikey: "true",
+			    autowidth: true,
+			    totalNum: true,
+			    pageNumList: true,
+
+
+					grouping:false,
+					groupingView : {
+               			groupColumnShow : [false],
+             		},
+
+            };
+            $("#xsdcjcxGridIdGrid").jqGrid(settings);
+        };
+
+        
+     function initxsdcjcxGridIdDate(){
+	}
+	function xsdcjcxGridIdKcxzFormatter(value, options, row){
+	  try{
+	       if(value==undefined){
+		      return "";
+		   }
+		   var cellValue=value;
+		   var formatterValue=`44:专业必修课;11:通识教育必修课;12:通识教育选修课;31:学科基础课;40:专业核心课;45:专业选修课;50:基础实践;51:专业实践;52:综合实践;53:其他实践;54:短学期实践;70:辅修双学位理论;71:辅修双学位实践;99:公共选修课;90:必修;32:工程基础课;98:重修课;43:专业基础课;16:限定性选修课;41:专业方向组选课;42:专业任选课`;
+<!--		   formatterValue = formatterValue.replace(/[\W_]/g, "\\$&");-->
+		   if(formatterValue!=undefined){
+		      var formatterValues=formatterValue.split(";");
+		      for(var i =0;i<formatterValues.length;i++){ 
+				 var formatterItem = formatterValues[i];
+				 var labelValues=formatterItem.split(":");
+				 if(labelValues[0]==cellValue){
+				    cellValue=labelValues[1];
+				 }
+			  } 
+		   }
+		   cellValue="<span  originalValue='" +value + "'>" + (cellValue ? cellValue : '') + "</span>";
+			 return cellValue;
+	   }catch(err){}
+	   return value;
+	}
+	function xsdcjcxGridIdKclxFormatter(value, options, row){
+	  try{
+	       if(value==undefined){
+		      return "";
+		   }
+		   var cellValue=value;
+		   var formatterValue=`98:学分认定;11:军训;12:毕业（设计）论文;13:实习;14:教育实习;21:教学实习;22:课程设计;19:短学期实践;15:专业基础课;9:综合实践;8:专业实践;7:实践课;6:通识选修课;4:专业选修课;3:专业必修课;2:专业核心课;1:学科基础课;10:通识教育必修课;99:理论课;50:毕业教育;23:生产实践;24:入学教育`;
+<!--		   formatterValue = formatterValue.replace(/[\W_]/g, "\\$&");-->
+		   if(formatterValue!=undefined){
+		      var formatterValues=formatterValue.split(";");
+		      for(var i =0;i<formatterValues.length;i++){ 
+				 var formatterItem = formatterValues[i];
+				 var labelValues=formatterItem.split(":");
+				 if(labelValues[0]==cellValue){
+				    cellValue=labelValues[1];
+				 }
+			  } 
+		   }
+		   cellValue="<span  originalValue='" +value + "'>" + (cellValue ? cellValue : '') + "</span>";
+			 return cellValue;
+	   }catch(err){}
+	   return value;
+	}
+	function xsdcjcxGridIdKsxsFormatter(value, options, row){
+	  try{
+	       if(value==undefined){
+		      return "";
+		   }
+		   var cellValue=value;
+		   var formatterValue=`2:考查;1:考试;11:一类考试;22:二类考试;333:三类考试`;
+<!--		   formatterValue = formatterValue.replace(/[\W_]/g, "\\$&");-->
+		   if(formatterValue!=undefined){
+		      var formatterValues=formatterValue.split(";");
+		      for(var i =0;i<formatterValues.length;i++){ 
+				 var formatterItem = formatterValues[i];
+				 var labelValues=formatterItem.split(":");
+				 if(labelValues[0]==cellValue){
+				    cellValue=labelValues[1];
+				 }
+			  } 
+		   }
+		   cellValue="<span  originalValue='" +value + "'>" + (cellValue ? cellValue : '') + "</span>";
+			 return cellValue;
+	   }catch(err){}
+	   return value;
+	}
+	function xsdcjcxGridIdKcgsFormatter(value, options, row){
+	  try{
+	       if(value==undefined){
+		      return "";
+		   }
+		   var cellValue=value;
+		   var formatterValue=`2:语言类;9:其他类;5:实践类;1:理论类;6:艺术类;3:实验（实训）类;4:体育类;001:艺术美育类;002:经济管理类;003:工程技术类;004:人文社科类;005:绿色工业类;006:创新创业类;007:国际视野类;008:科学素养类;009:人文情怀类;010:数智素养类;011:思政类必修`;
+<!--		   formatterValue = formatterValue.replace(/[\W_]/g, "\\$&");-->
+		   if(formatterValue!=undefined){
+		      var formatterValues=formatterValue.split(";");
+		      for(var i =0;i<formatterValues.length;i++){ 
+				 var formatterItem = formatterValues[i];
+				 var labelValues=formatterItem.split(":");
+				 if(labelValues[0]==cellValue){
+				    cellValue=labelValues[1];
+				 }
+			  } 
+		   }
+		   cellValue="<span  originalValue='" +value + "'>" + (cellValue ? cellValue : '') + "</span>";
+			 return cellValue;
+	   }catch(err){}
+	   return value;
+	}
+	function xsdcjcxGridIdXdxzFormatter(value, options, row){
+	  try{
+	       if(value==undefined){
+		      return "";
+		   }
+		   var cellValue=value;
+		   var formatterValue=`1:初修;2:重修`;
+<!--		   formatterValue = formatterValue.replace(/[\W_]/g, "\\$&");-->
+		   if(formatterValue!=undefined){
+		      var formatterValues=formatterValue.split(";");
+		      for(var i =0;i<formatterValues.length;i++){ 
+				 var formatterItem = formatterValues[i];
+				 var labelValues=formatterItem.split(":");
+				 if(labelValues[0]==cellValue){
+				    cellValue=labelValues[1];
+				 }
+			  } 
+		   }
+		   cellValue="<span  originalValue='" +value + "'>" + (cellValue ? cellValue : '') + "</span>";
+			 return cellValue;
+	   }catch(err){}
+	   return value;
+	}
+	function xsdcjcxGridIdKclbFormatter(value, options, row){
+	  try{
+	       if(value==undefined){
+		      return "";
+		   }
+		   var cellValue=value;
+		   var formatterValue=`01:公共基础课;02:学科基础课;03:专业课;4:通识选修课;05:通识教育必修课;06:学科基础类必修课;07:专业基础课;08:专业必修课;09:专业选修课;10:通识教育选修课;11:基础实践;12:专业实践;13:综合实践;14:限定性选修课`;
+<!--		   formatterValue = formatterValue.replace(/[\W_]/g, "\\$&");-->
+		   if(formatterValue!=undefined){
+		      var formatterValues=formatterValue.split(";");
+		      for(var i =0;i<formatterValues.length;i++){ 
+				 var formatterItem = formatterValues[i];
+				 var labelValues=formatterItem.split(":");
+				 if(labelValues[0]==cellValue){
+				    cellValue=labelValues[1];
+				 }
+			  } 
+		   }
+		   cellValue="<span  originalValue='" +value + "'>" + (cellValue ? cellValue : '') + "</span>";
+			 return cellValue;
+	   }catch(err){}
+	   return value;
+	}
+	function xsdcjcxGridIdSfbkFormatter(value, options, row){
+	  try{
+	       if(value==undefined){
+		      return "";
+		   }
+		   var cellValue=value;
+		   var formatterValue=`0:正考;1:补考;2:缓考补考`;
+<!--		   formatterValue = formatterValue.replace(/[\W_]/g, "\\$&");-->
+		   if(formatterValue!=undefined){
+		      var formatterValues=formatterValue.split(";");
+		      for(var i =0;i<formatterValues.length;i++){ 
+				 var formatterItem = formatterValues[i];
+				 var labelValues=formatterItem.split(":");
+				 if(labelValues[0]==cellValue){
+				    cellValue=labelValues[1];
+				 }
+			  } 
+		   }
+		   cellValue="<span  originalValue='" +value + "'>" + (cellValue ? cellValue : '') + "</span>";
+			 return cellValue;
+	   }catch(err){}
+	   return value;
+	}
+	function xsdcjcxGridIdKcsxFormatter(value, options, row){
+	  try{
+	       if(value==undefined){
+		      return "";
+		   }
+		   var cellValue=value;
+		   var formatterValue=`1:必修;2:限选;3:任选;4:辅修;21:选修;7:双选;8:通选;9:其他;6:双必;5:实践`;
+<!--		   formatterValue = formatterValue.replace(/[\W_]/g, "\\$&");-->
+		   if(formatterValue!=undefined){
+		      var formatterValues=formatterValue.split(";");
+		      for(var i =0;i<formatterValues.length;i++){ 
+				 var formatterItem = formatterValues[i];
+				 var labelValues=formatterItem.split(":");
+				 if(labelValues[0]==cellValue){
+				    cellValue=labelValues[1];
+				 }
+			  } 
+		   }
+		   cellValue="<span  originalValue='" +value + "'>" + (cellValue ? cellValue : '') + "</span>";
+			 return cellValue;
+	   }catch(err){}
+	   return value;
+	}
+	function xsdcjcxGridIdUnFormatter(value, options, cellObject) {
+	  try{
+	      var html=cellObject.innerHTML;
+	      var cellValue= $(html).attr("originalValue");
+		  return cellValue;
+	   }catch(err){}
+       return value;
+    }
+	function iChecks()
+	{
+		$(".i-checks").iCheck({
+	           checkboxClass: 'icheckbox_square-green',
+	           radioClass: 'iradio_square-green',
+	       });
+	}
+
+       function changeQueryHightxsdcjcxGridId() {
+        var height = $("#xsdcjcxGridIdGridQuery").css("height");
+
+        let arr = []
+        $("#xsdcjcxGridIdGridQuery .form-group").each(function (index, item) {
+            if ($(item).css('display') != 'none') {
+                arr.push(item)
+            }
+        })
+        if (height == "90px") {
+            $("#xsdcjcxGridIdGridQuery").css("overflow", "unset");
+            $("#xsdcjcxGridIdGridQuery").css("height", "auto");
+            $("#gqkzxsdcjcxGridId").addClass("active");
+            $("#gqkzspxsdcjcxGridId").html("收起筛选");
+
+            // 显示5个以后的表单项目
+            $(arr).each(function (index, item) {
+                if (index >= 10) {
+                    $(item).css({'visibility': 'visible'})
+                }
+
+            })
+        } else {
+            $("#xsdcjcxGridIdGridQuery").css("height", "90px");
+            $("#gqkzxsdcjcxGridId").removeClass("active");
+            $("#gqkzspxsdcjcxGridId").html("显示筛选");
+
+            // 隐藏5个以后的表单项
+            $(arr).each(function (index, item) {
+                if (index >= 10) {
+                    $(item).css({'visibility': 'hidden'})
+                }
+            })
+        }
+
+        computedTableHeihgtxsdcjcxGridId()
+    }
+
+    window.addEventListener('load', function () {
+        let arr = []
+        $("#xsdcjcxGridIdGridQuery .form-group").each(function (index, item) {
+            if ($(item).css('display') != 'none') {
+                arr.push(item)
+            }
+        })
+        $(arr).each(function (index, item) {
+            if (index >= 10) {
+                $(item).css({'visibility': 'hidden'})
+            }
+        })
+         // 搜索栏显示end
+         $("#xsdcjcxGridIdGridQuery").css('visibility','visible').css("top", "0");
+         $("#gqkzxsdcjcxGridId").show();
+
+        // 20221031 add 表格中间数据部分的最大高度是动态的
+        computedTableHeihgtxsdcjcxGridId()
+        // 20221031 add 表格中间数据部分的最大高度是动态的 end
+
+    })
+    function computedTableHeihgtxsdcjcxGridId(){
+        let searchHeight = $('#xsdcjcxGridIdGridQuery').height()
+        // 表格上边操作按钮
+        let btnsHeight = $('#xsdcjcxGridId_wrapper').prev('.row').height()
+        let height = searchHeight + btnsHeight
+        let cssText = "max-height:calc(100vh - 85px - 20px - " + height + "px)!important;";
+        let ndCss = "height:calc(100vh - 115px - " + height + "px)!important;padding-top: calc(50vh - 115px - " + height + "px)!important;";
+        let styleText = $('#gbox_xsdcjcxGridIdGrid .ui-jqgrid-bdiv').attr("style");
+        if(styleText){
+			let styleObj = styleToObj(styleText);
+			if(styleObj && styleObj.height && "auto"!=styleObj.height ){
+				cssText=cssText+("height:"+styleObj.height+";");
+				ndCss = "height:100%;padding-top:calc(50vh - 115px - " + height + "px);";
+			}
+        }
+        if (window.innerWidth > 768) {
+                $('#gbox_xsdcjcxGridIdGrid .ui-jqgrid-bdiv').css("cssText", cssText);
+    }
+        if($('#gbox_xsdcjcxGridIdGrid .nodate_content').is(":hidden")){
+        	ndCss = ndCss +"display:none;";
+        }else{
+        	ndCss = ndCss +"display: block;";
+        }
+        $('#gbox_xsdcjcxGridIdGrid .nodate_content').css("cssText", ndCss);
+    }
+    function styleToObj(style) {
+        var Arr = style.split(';')
+        let styleArr=[];
+        let str = '';
+        for(let i = 0 ;i< Arr.length;i++){
+        	let ar = Arr[i].split(':');
+        	if(ar[0] && ar[0].trim() && ar[1] && ar[1].trim()){
+        		str=str+'"'+ar[0].trim()+'":"'+ar[1].trim()+'",';
+        	}
+        }
+        str = str.substring(0, str.lastIndexOf(','))
+        str = '{' + str + '}'
+        return JSON.parse(str)
+      }
+    window.addEventListener('resize',function(){
+        computedTableHeihgtxsdcjcxGridId()
+    })
+
+	window.addEventListener('load', function () {
+		var columnNames=$("#xsdcjcxGridIdGrid").jqGrid('getGridParam','colModel');
+		for(var item in columnNames){
+			var info=columnNames[item];
+			if(info.hasOwnProperty("name")){
+				if(info.name=="xqxh"){
+					$("#xsdcjcxGridIdGrid").bind("jqGridLoadComplete", function () {
+						let html = "<div class='copy-icon' onclick='copyXh(this)' title='点击复制'></div>"
+						var ele=$('#xsdcjcxGridIdGrid .jqgrow td[aria-describedby="xsdcjcxGridIdGrid_xqxh"]');
+						var aele1,iconele1;
+						$(ele).each(function(){
+						    aele1=$(this).find('a')
+						    iconele1=$(this).find('div.copy-icon')
+						    if(aele1!=undefined&&aele1.length>0&&iconele1.length==0){
+						        $(this).append(html)
+						    }
+						})
+					})
+				}
+				if(info.name=="jsbh"){
+					$("#xsdcjcxGridIdGrid").bind("jqGridLoadComplete", function () {
+						let html = "<div class='copy-icon' onclick='copyXh(this)' title='点击复制'></div>"
+						var ele=$('#xsdcjcxGridIdGrid .jqgrow td[aria-describedby="xsdcjcxGridIdGrid_jsbh"]');
+						var aele1,iconele1;
+						$(ele).each(function(){
+						    aele1=$(this).find('a')
+						    iconele1=$(this).find('div.copy-icon')
+						    if(aele1!=undefined&&aele1.length>0&&iconele1.length==0){
+						        $(this).append(html)
+						    }
+						})
+					})
+				}
+				if(info.name=="xh"){
+					$("#xsdcjcxGridIdGrid").bind("jqGridLoadComplete", function () {
+						let html = "<div class='copy-icon' onclick='copyXh(this)' title='点击复制'></div>"
+						var ele=$('#xsdcjcxGridIdGrid .jqgrow td[aria-describedby="xsdcjcxGridIdGrid_xh"]');
+						var aele1,iconele1;
+						$(ele).each(function(){
+						    aele1=$(this).find('a')
+						    iconele1=$(this).find('div.copy-icon')
+						    if(aele1!=undefined&&aele1.length>0&&iconele1.length==0){
+						        $(this).append(html)
+						    }
+						})
+					})
+				}
+				if(info.name=="kcbh"){
+					$("#xsdcjcxGridIdGrid").bind("jqGridLoadComplete", function () {
+						let html = "<div class='copy-icon' onclick='copyXh(this)' title='点击复制'></div>"
+						var ele=$('#xsdcjcxGridIdGrid .jqgrow td[aria-describedby="xsdcjcxGridIdGrid_kcbh"]');
+						var aele1,iconele1;
+						$(ele).each(function(){
+						    aele1=$(this).find('a')
+						    iconele1=$(this).find('div.copy-icon')
+						    if(aele1!=undefined&&aele1.length>0&&iconele1.length==0){
+						        $(this).append(html)
+						    }
+						})
+					})
+				}
+			}
+		}
+	})
+	function copyXh(copyBtn){
+		event.stopPropagation()
+		let xhText = $(copyBtn).prev().text()
+		if(!isEmpty(navigator.clipboard)){
+		    if(xhText){
+		        navigator.clipboard.writeText(xhText).then(() => {
+                    layer.msg('复制成功');
+                });
+		    }
+		}else{
+		    if(xhText){
+		        noHttpsCopyToClipboard(xhText)
+		        layer.msg('复制成功');
+		    }
+		}
+	}
+
+	function noHttpsCopyToClipboard(text){
+        var el = document.createElement('div');
+        el.contentEditable = true;
+        el.innerHTML = text;
+        el.style.position = 'absolute';
+        el.style.left = '-9999px';
+        document.body.appendChild(el);
+        el.focus();
+        document.execCommand('selectAll');
+        document.execCommand('copy');
+        document.body.removeChild(el);
+    }
+		function escapeInnerHtml(str) {
+			var entityMap = {
+				"&": "&amp;",
+				"<": "&lt;",
+				">": "&gt;",
+				'"': '&quot;',
+				"'": '&#39;',
+				"/": '&#x2F;'
+			};
+			var resultStr = str;
+			try {
+				resultStr = String(str).replace(/[&<>"'\/]/g, function (s) {
+					return entityMap[s];
+				});
+			} catch (e) {}			
+			return resultStr;
+		}
+    </script>
+        </div>
+
+        <div class="tab-pane fade" id="fxcj">
+            <iframe frameborder="0" scrolling="no" marginheight="0" marginwidth="0" style="width:100%; height:800px;"  src="/admin/xsd/xsdcjcx/qbcjcx?fxtype=1"></iframe>
+        </div>
+    
+            <div class="tab-pane fade" id="wzycj">
+                <iframe frameborder="0" scrolling="no" marginheight="0" marginwidth="0" style="width:100%; height:800px;"  src="/admin/xsd/xsdcjcx/qbcjcx?fxtype=9"></iframe>
+            </div>
+
+</div>
+<div id="transePjfxjd" style="display: none;">平均学分绩点</div>
+<!-- bootstrap-fileinput -->
+	  <script src="/static/vendors/bootstrap-fileinput/js/plugins/sortable.js?_t=1768303707405" type="text/javascript"></script>
+	  <script src="/static/vendors/bootstrap-fileinput/js/fileinput.js?_t=1768303707405" type="text/javascript"></script>
+	  <script src="/static/vendors/bootstrap-fileinput/themes/explorer/theme.js?_t=1768303707405" type="text/javascript"></script>
+	  <script src="/static/vendors/bootstrap-fileinput/js/locales/zh.js?_t=1768303707405" type="text/javascript"></script>
+
+<!-- simditor -->
+	    <script type="text/javascript" src="/static/vendors/simditor/js/module.js?_t=1768303707405"></script>
+	    <script type="text/javascript" src="/static/vendors/simditor/js/uploader.js?_t=1768303707405"></script>
+	    <script type="text/javascript" src="/static/vendors/simditor/js/hotkeys.js?_t=1768303707405"></script>
+	    <script type="text/javascript" src="/static/vendors/simditor/js/simditor.js?_t=1768303707405"></script>
+
+<script type="text/javascript" src="/static/common/js/utils.js?_t=1768303707405"></script>
+<script>
+    var jwUtils = new JwUtils()
+    // 平均学分绩点翻译处理
+    var transPjfxjd = $("#transePjfxjd").val();
+    function getXspjxfjd() {
+        $.ajax({
+            url: "/admin/xsd/xsdzgcjcx/getXspjxfjd",
+            dataType: "json",
+            type: "get",
+            success: function (res) {
+                $("#pjxfjd").html(transPjfxjd + "：" + res.data + "（供测试核对使用）");
+            }
+        })
+    }
+    getXspjxfjd()
+    var wpjcsfkckcj = ''
+    function getXspjcs(){
+        $.ajax({
+            url:"/admin/pj/xsdpj/getPjxtsz",
+                type:"get",
+                success:function(res){
+                    if(res.ret == 0 && res.data && res.data.wpjcsfkccj){
+                        wpjcsfkckcj = res.data.wpjcsfkccj
+                        if(wpjcsfkckcj == '0'){
+                            $("#wpjcsfkckcj").show() 
+                        }
+                    }
+                }
+        })
+    }
+    
+        $(document).ready(function(){
+            $('#tips').hide()
+            $.ajax({
+                url:"/admin/cjgl/cjlrxtcssz/getzcjMenuDisplay",
+                success:function(res){
+                    if(res.ret == 0 && res.data && res.data.flag == 1){
+                        if(res.data.text){
+                            $('#tips2').show()
+                            $('#hbutTip').text(res.data.text)
+                        }
+                    }
+                }
+            })
+        })
+    
+    function printXscjData() {
+        var startXnxq = $("#startXnxq").val()
+        var endXnxq = $("#endXnxq").val();
+        top.layer.open({
+            type: 2,
+            area: ["30%", "40%"],
+            title: "选择模板",
+            maxmin: true, //开启最大化最小化按钮
+            content: "/admin/xsd/xsdzgcjcx/chooseTemplate?startXnxq=" + startXnxq + "&endXnxq=" + endXnxq + "&dylx=1",
+            btn: ['关闭'],
+            cancel: function (index) {
+                layer.closeAll();
+            },
+            end: function () {
+                layer.closeAll();
+            }
+        });
+    }
+
+    function rowDialogDetailForView1(titel, url, gridid, id) {
+        var xnxq = $("#startXnxq").val();
+        var xnxq2 = $("#endXnxq").val();
+        url = url + "?xnxq=" + xnxq + "&xnxq2=" + xnxq2;
+        if (navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)) {//如果是移动端，就使用自适应大小弹窗
+            width = 'auto';
+            height = 'auto';
+        } else {//如果是PC端，根据用户设置的width和height显示。
+            width = '100%';
+            height = '100%';
+        }
+        top.layer.open({
+            type: 2,
+            area: [width, height],
+            title: titel,
+            maxmin: true, //开启最大化最小化按钮
+            content: url,
+            btn: ['关闭'],
+            cancel: function (index) {
+                layer.closeAll();
+            },
+            end: function () {
+                layer.closeAll();
+            }
+        });
+    }
+    $(document).ready(function() {
+        getXspjcs()
+        $("#startXnxq").val("001")
+        $("#endXnxq").val("001")
+		search("xsdcjcxGridIdGrid");
+        $('#xsdcjcxGridIdGrid').bind("jqGridLoadError", function (e, resp) {
+            let msgDom = $('#gview_xsdcjcxGridIdGrid').find(".nodate_content .nodate_msg");
+            let ret = resp.responseJSON;
+            if (resp.status == 401) {
+                msgDom.text('学生未注册，不允许查看当前页面')
+            }
+            console.log(resp,'错误信息');
+        });
+        $('#xsdcjcxGridIdGrid').bind("jqGridLoadComplete", function (e, res) {
+           if(res.ret == 1){
+                $('#wpjcjbkc').html(res.msg)
+                $('#wpjcjbkc').show()
+           }else if(res.ret == -1){
+                $('#wpjcjbkc').html('未获取到评教数据，无法查看成绩，可点击<a style="color:#2AA0F5;text-decoration:none;margin:0 3px;"  onclick="location.reload()">刷新</a>重试。')
+                $('#wpjcjbkc').show()
+           }
+        });
+
+        try {
+            // 尝试获取并解析fxbz  fxbz 辅修标志 0为主修 1为辅修 9为微专业
+            var fxbzStr = '[0]';
+            var fxbz = [];
+            // 判断是否为空或非数组格式
+            if (fxbzStr && fxbzStr.trim().length > 0) {
+                fxbz = JSON.parse(fxbzStr);
+            }
+            // 检查fxbz是否包含1或9
+            var containsOneOrNine = Array.isArray(fxbz) && (fxbz.includes(1) || fxbz.includes(9));
+            // 检查fxbz是否包含1
+            var containsOne = Array.isArray(fxbz) && fxbz.includes(1);
+            // 检查fxbz是否包含9
+            var containsNine = Array.isArray(fxbz) && fxbz.includes(9);
+            // 根据检查结果显示或隐藏ID为zx的div
+            if (!containsOneOrNine) {
+                $('#myTab').hide();
+            }
+            if (!containsOne) {
+                $('#liFxcj').hide();
+            }
+            if (!containsNine) {
+                $('#liWzycj').hide();
+            }
+        } catch (e) {
+            console.error("解析fxbz时发生错误:", e);
+            // 发生错误时默认隐藏div，或者可以采取其他措施
+            $('#myTab').hide();
+        }
+    });
+
+    var dbnameNow = 'hbut'  //数据库名称,用于单位区分
+    $(function(){
+        $("#xsdcjcxGridIdGrid").on("jqGridLoadComplete", function (e, data) {
+            if (!data?.results || !Array.isArray(data.results) || data.results.length === 0) {
+                return;
+            }
+            const grid = $(this);
+            for (const row of data.results) {
+                const rowId = row.id;
+                if (!rowId) continue; // 跳过无 id 的行（防御性编程）
+                // 1. 如果 xssfwpj == "1"，整行置灰
+                if (row.xssfwpj === "1") {
+                    $("#" + rowId).addClass('font-gray');
+                }
+                if(dbnameNow === 'dev' || dbnameNow === 'gxnu' || dbnameNow === 'hncj'){  //gxnu广西师范大学 hncj河南城建
+                    // 2. hdxf 为空（null/undefined/""）时显示 ******
+                    if (row.hdxf == null || row.hdxf === "") {
+                        grid.jqGrid('setCell', rowId, 'hdxf', '******');
+                    }
+                    // 3. jd 为空时显示 ******
+                    if (row.jd == null || row.jd === "") {
+                        grid.jqGrid('setCell', rowId, 'jd', '******');
+                    }
+                }
+            }
+        })
+    });
+
+    function customExportDataNew(title,url,gridId,w,h) {
+        jwUtils.customExportData({
+            gridId: 'xsdcjcxGridId',
+            module: 'CJGL_XSDQBCJCX_EXPORT',
+            placeholder: '全部成绩查询',
+            modalName: '导出',
+            hiddenHeader: false,
+            hiddenFileType: true,
+            hiddenFileName: false,
+            selectList: SelectList,
+            contextPath: "",
+            toDownloadCenter: true,
+            defaultExport: true, // 默认通用导出
+            exportUrl: '/admin/system/export/urlExport',
+            originUrl: "/admin/xsd/xsdcjcx/xsdQueryXscjList?fxbz=0", // 源数据列表接口
+        })
+    }
+
+    // 打印rpx444
+    function printRpx(title, url, gridId, w, h) {
+        var username = '2311111210';
+        var runqianMenuUrl = "/xsd/cjgl/xscjdy_yx.rpx";
+        url = url + "?xhid=" + username +"&runqianMenuUrl=" + runqianMenuUrl +"&RqType=2";
+        let zdArr = jwUtils.getNonEmptyQueryParamsNames(url);
+        url = jwUtils.getNewReportUrlWithParam(url, zdArr);
+        topJwLayer.open({
+            type: 2,
+            area: ["98%", "98%"],
+            title: title,
+            maxmin: true, //开启最大化最小化按钮
+            content: url,
+            btn: ['关闭11'],
+            cancel: function (index) {
+                layer.closeAll();
+            },
+            success: function (layero, index) {
+                var body = top.layer.getChildFrame('body', index);
+                var iframeWin = layero.find('iframe')[0];
+                if (iframeWin.contentWindow.printDone) {
+                    setTimeout(() => {
+                        top.layer.close(index)
+                    }, 3000)
+                }
+            },
+        });
+    }
+    //获取系统当前学年学期
+    function getCurXnxqNew(){
+        $.ajax({
+            url: "/admin/xsd/xsdcjcx/getCurrentXnxq",
+            dataType: "json",
+            type: "get",
+            success: function (res) {
+                if(res.ret == 0){
+                    $("#curXnxqNew").html(res.data + "学年学期");
+                }
+            }
+            ,error: function (res) {
+                $("#curXnxqNew").html("学年学期获取失败"); //完善异常情况下一直显示提示加载中的问题
+            }
+        })
+    }
+    $(function () {
+        // DOM 就绪后执行
+        getCurXnxqNew();
+    });
+</script>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!DOCTYPE html>
+<script src="/static/vendors/bootstrap/js/bootstrap.min.js?_t=1768303707405"></script>
+<!-- Peity -->
+		<script src="/static/vendors/peity/jquery.peity.min.js?_t=1768303707405"></script>
+<script src="/static/vendors/layer/layer3.5.1.js?_t=1768303707405"></script>
+    
+        
+       <script src="/static/vendors/layer/layer3.5.1.js?_t=1768303707405"></script>
+<!-- jqGrid -->
+	    <script src="/static/vendors/jqgrid/js/i18n/grid.locale-cn.js?_t=1768303707405"></script>
+	    <script src="/static/vendors/jqgrid/js/jquery.jqGrid.min.js?_t=1768303707405"></script>
+	    <script src="/static/vendors/jqgrid/plugins/jquery.tablednd.js?_t=1768303707405"></script>
+<!-- jqGrid curdtools-->
+		<script src="/static/common/js/curdtools_jqgrid.js?_t=1768303707405"></script>
+<!-- iCheck -->
+		<script src="/static/vendors/iCheck/icheck.min.js?_t=1768303707405"></script>
+        <script src="/static/vendors/iCheck/custom.min.js?_t=1768303707405"></script>
+<!-- Sweet alert -->
+		<script src="/static/vendors/sweetalert/sweetalert.min.js?_t=1768303707405"></script>
+<!-- 时间控件 -->
+	   <script src="/static/vendors/datepicker/bootstrap-datepicker.js?_t=1768303707405"></script>
+
+<input type="hidden" id="adminPath" value="/admin"/>
+<input type="hidden" id="staticPath" value="/static"/>
+<!-- 自定义js -->
+<script src="/static/common/js/content.js?_t=1768303707405"></script>
+
+
+ 
+</body>
+</html>
+    
