@@ -30,7 +30,7 @@
 
 ```
 hbut/
-├── cursor/                      # 【后端】
+├── backend/                      # 【后端】
 │   ├── cjcx+pm.py              # 主程序 (所有 API 在此)
 │   ├── requirements.txt         # Python 依赖
 │   └── nginx-hbut.conf          # Nginx 配置示例
