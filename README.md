@@ -14,7 +14,7 @@
 
 ```
 hbut/
-├── cursor/                    # 后端服务
+├── backend/                    # 后端服务
 │   ├── cjcx+pm.py            # FastAPI 后端主程序
 │   ├── requirements.txt       # Python 依赖
 │   └── 部署指南.md            # 服务器部署文档
