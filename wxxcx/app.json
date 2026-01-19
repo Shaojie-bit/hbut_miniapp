@@ -1,6 +1,7 @@
 {
   "pages": [
     "pages/login/login",
+    "pages/schedule/schedule",
     "pages/index/index",
     "pages/logs/logs"
   ],
@@ -9,6 +10,26 @@
     "navigationBarBackgroundColor": "#fff",
     "navigationBarTitleText": "HBUT 教务助手",
     "navigationBarTextStyle": "black"
+  },
+  "tabBar": {
+    "color": "#9ca3af",
+    "selectedColor": "#4f46e5",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/schedule/schedule",
+        "text": "课表",
+        "iconPath": "assets/tab-schedule.png",
+        "selectedIconPath": "assets/tab-schedule-active.png"
+      },
+      {
+        "pagePath": "pages/index/index",
+        "text": "成绩",
+        "iconPath": "assets/tab-grade.png",
+        "selectedIconPath": "assets/tab-grade-active.png"
+      }
+    ]
   },
   "style": "v2",
   "sitemapLocation": "sitemap.json"

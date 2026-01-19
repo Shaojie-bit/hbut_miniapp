@@ -1,6 +1,6 @@
 <view class="container">
   <view class="header">
-    <image class="logo" src="/assets/logo.png" mode="aspectFit"></image> <!-- Placeholder logo -->
+    <image class="logo" src="/assets/logo.svg" mode="aspectFit"></image> <!-- Placeholder logo -->
     <text class="title">HBUT 教务助手</text>
     <text class="subtitle">更优雅的查分体验</text>
   </view>
@@ -16,15 +16,18 @@
       <input class="input" password type="text" placeholder="请输入密码" model:value="{{password}}" />
     </view>
 
-    <view class="input-group">
+    <!-- Captcha Row (Hidden by default) -->
+    <view class="input-group" wx:if="{{needCaptcha}}">
       <text class="label">验证码</text>
       <view class="captcha-row">
-        <input class="input captcha-input" type="text" placeholder="验证码" model:value="{{captcha}}" />
+        <input class="input captcha-input" type="text" placeholder="看不清点图片刷新" model:value="{{captcha}}" />
         <image class="captcha-img" src="{{captchaImg}}" bindtap="loadCaptcha"></image>
       </view>
     </view>
 
-    <button class="login-btn" bindtap="handleLogin" loading="{{loading}}" disabled="{{loading}}">登录</button>
+    <button class="login-btn" bindtap="handleLogin" loading="{{loading}}" disabled="{{loading}}">
+       {{loading ? '登录中...' : '登录'}}
+    </button>
   </view>
   
   <view class="footer">

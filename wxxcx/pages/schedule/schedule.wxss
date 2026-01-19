@@ -1,0 +1,195 @@
+/* pages/schedule/schedule.wxss */
+page {
+  background-color: var(--bg-color);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- Top Bar --- */
+.container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+}
+
+.top-bar {
+  background: #fff;
+  padding: 10rpx 30rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #f3f4f6;
+  height: 88rpx;
+  box-sizing: border-box;
+}
+
+.week-selector {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+}
+
+.picker-inner {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+}
+
+.picker-text {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.picker-arrow {
+  width: 0; 
+  height: 0; 
+  border-left: 10rpx solid transparent;
+  border-right: 10rpx solid transparent;
+  border-top: 12rpx solid var(--text-main);
+}
+
+.semester-info {
+  font-size: 24rpx;
+  color: var(--text-secondary);
+  background: #f3f4f6;
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
+}
+
+.refresh-btn {
+  font-size: 26rpx;
+  color: var(--primary-color);
+}
+
+/* --- Week Header --- */
+.week-header {
+  display: flex;
+  background: #f8f9fa;
+  border-bottom: 1px solid #eee;
+  height: 80rpx;
+}
+
+.header-cell {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 26rpx;
+  color: var(--text-main);
+}
+
+.month-col {
+  flex: 0 0 60rpx; /* Sidebar width */
+  font-size: 24rpx;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+.day-name {
+  font-weight: 500;
+}
+
+.today .day-name {
+  color: var(--primary-color);
+  font-weight: 800;
+}
+
+/* --- Timetable Body --- */
+.timetable-scroll {
+  flex: 1;
+  background: #fff;
+  /* height is automatic via flex 1 */
+}
+
+.timetable-body {
+  display: flex;
+  position: relative;
+  min-height: 1320rpx; /* 12 periods * 110rpx */
+  padding-bottom: 50rpx;
+}
+
+.sidebar {
+  width: 60rpx;
+  background: #f9fafb;
+  flex-shrink: 0;
+}
+
+.sidebar-cell {
+  height: 110rpx;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 24rpx;
+  color: var(--text-secondary);
+  border-bottom: 1px dashed #eee;
+}
+
+.course-grid {
+  flex: 1;
+  position: relative;
+}
+
+/* Horizontal Grid Lines */
+.grid-row-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: #f3f4f6;
+  /* top set inline */
+}
+
+/* Course Card */
+.course-card-container {
+  position: absolute;
+  width: 13.5%; /* Roughly 100/7 */
+  padding: 2rpx;
+  box-sizing: border-box;
+  overflow: hidden;
+  z-index: 10;
+  border-radius: 12rpx;
+}
+
+.course-card {
+  width: 100%;
+  height: 100%;
+  border-radius: 8rpx;
+  padding: 8rpx;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  color: #333;
+  opacity: 0.9;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.course-name {
+  font-size: 20rpx;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 6rpx;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.course-room {
+  font-size: 18rpx;
+  opacity: 0.8;
+}
+
+/* Empty State */
+.empty-state {
+  position: absolute;
+  top: 400rpx;
+  left: 0; 
+  right: 0;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 28rpx;
+}

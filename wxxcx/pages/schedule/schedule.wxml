@@ -1,0 +1,68 @@
+<view class="container">
+  <!-- Top Bar: Week & Semester Selector -->
+  <view class="top-bar">
+    <view class="week-selector">
+      <picker bindchange="onWeekChange" value="{{currentWeekIndex}}" range="{{weeksArray}}">
+        <view class="picker-inner">
+          <text class="picker-text">第 {{currentWeek}} 周</text>
+          <view class="picker-arrow"></view>
+        </view>
+      </picker>
+      <!-- Semester Picker -->
+      <picker bindchange="onSemesterChange" value="{{semesterIndex}}" range="{{semesterArray}}">
+        <view class="semester-info">{{semester}} ▼</view>
+      </picker>
+    </view>
+    <view class="refresh-btn" bindtap="fetchTimetable">
+      <text>↻ 刷新</text>
+    </view>
+  </view>
+
+  <!-- Week Header (Mon-Sun) -->
+  <view class="week-header">
+    <view class="header-cell month-col">{{currentMonth}}月</view>
+    <block wx:for="{{days}}" wx:key="index">
+      <view class="header-cell {{item.isToday ? 'today' : ''}}">
+        <text class="day-name">{{item.name}}</text>
+        <!-- We could add dynamic date here like '12/5' later -->
+      </view>
+    </block>
+  </view>
+
+  <!-- Scrollable Timetable Area -->
+  <scroll-view scroll-y class="timetable-scroll">
+    <view class="timetable-body">
+      <!-- Sidebar: 1-12 periods -->
+      <view class="sidebar">
+        <block wx:for="{{[1,2,3,4,5,6,7,8,9,10,11,12]}}" wx:key="*this">
+          <view class="sidebar-cell">{{item}}</view>
+        </block>
+      </view>
+
+      <!-- Course Grid -->
+      <view class="course-grid">
+         <!-- Horizontal Lines for guidance -->
+         <block wx:for="{{[1,2,3,4,5,6,7,8,9,10,11,12]}}" wx:key="*this">
+            <view class="grid-row-line" style="top: {{(item-1)*110}}rpx;"></view>
+         </block>
+
+         <!-- Course Cards -->
+         <block wx:for="{{weekCourses}}" wx:key="index">
+           <view class="course-card-container" 
+                 style="left: {{(item.day-1)*100/7}}%; top: {{(item.start-1)*110}}rpx; height: {{item.step*110}}rpx;"
+                 bindtap="showCourseDetail" data-course="{{item}}">
+              <view class="course-card" style="background-color: {{item.color}};">
+                 <text class="course-name">{{item.name}}</text>
+                 <text class="course-room">@{{item.room}}</text>
+              </view>
+           </view>
+         </block>
+         
+         <!-- Placeholder if empty -->
+         <view wx:if="{{weekCourses.length === 0 && !loading}}" class="empty-state">
+            <text>本周没有课哦 ~</text>
+         </view>
+      </view>
+    </view>
+  </scroll-view>
+</view>

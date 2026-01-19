@@ -5,4 +5,4 @@ requests==2.31.0
 beautifulsoup4==4.12.2
 pycryptodome==3.19.0
 pydantic==2.5.0
-
+ddddocr==1.4.7
