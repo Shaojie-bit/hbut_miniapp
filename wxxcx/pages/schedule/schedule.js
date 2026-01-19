@@ -32,6 +32,23 @@ Page({
 
     onLoad() {
         this.initWeeks();
+
+        // 1. Load cached timetable first (instant display)
+        const cachedTimetable = wx.getStorageSync('cached_timetable');
+        if (cachedTimetable) {
+            const processed = cachedTimetable.map(c => ({
+                ...c,
+                color: this.getCourseColor(c.name),
+                weeks_list: this.parseWeeks(c.weeks_list)
+            }));
+            this.setData({
+                allCourses: processed,
+                loading: false
+            });
+            this.filterCoursesForWeek(this.data.currentWeek);
+        }
+
+        // 2. Then check login and refresh in background
         this.checkLoginAndFetch();
     },
 
@@ -73,20 +90,31 @@ Page({
 
     checkLoginAndFetch() {
         const token = wx.getStorageSync('user_token');
-        console.log('Schedule Page Token Check:', token);
-        if (!token) {
-            wx.showToast({ title: '请先登录', icon: 'none' });
-            setTimeout(() => {
-                wx.redirectTo({ url: '/pages/login/login' });
-            }, 1500);
+        const hasCredentials = wx.getStorageSync('username') && wx.getStorageSync('password');
+        const hasCache = this.data.allCourses.length > 0;
+
+        console.log('Schedule Page Token Check:', token, 'HasCache:', hasCache);
+
+        if (!token && !hasCredentials) {
+            // No token AND no saved credentials - must login
+            if (!hasCache) {
+                wx.showToast({ title: '请先登录', icon: 'none' });
+                setTimeout(() => {
+                    wx.redirectTo({ url: '/pages/login/login' });
+                }, 1500);
+            }
             return;
         }
-        this.fetchTimetable();
+
+        // If we have token or credentials, try to fetch (silently if cache exists)
+        this.fetchTimetable(!hasCache); // showLoading = true only if no cache
     },
 
-    async fetchTimetable() {
-        wx.showNavigationBarLoading();
-        this.setData({ loading: true });
+    async fetchTimetable(showLoading = true) {
+        if (showLoading) {
+            wx.showNavigationBarLoading();
+            this.setData({ loading: true });
+        }
 
         try {
             const res = await new Promise((resolve, reject) => {
@@ -104,7 +132,10 @@ Page({
 
             if (res.statusCode === 200 && res.data.code === 200) {
                 const rawList = res.data.data;
-                const serverWeek = res.data.current_week || 1; // Default from server
+                const serverWeek = res.data.current_week || 1;
+
+                // Save raw data to cache
+                wx.setStorageSync('cached_timetable', rawList);
 
                 // Process data (assign colors)
                 const processed = rawList.map(c => ({
@@ -121,17 +152,26 @@ Page({
                 });
 
                 this.filterCoursesForWeek(serverWeek);
+                console.log('[Schedule] Data refreshed from server');
 
             } else if (res.data.code === 401) {
+                // Token expired - but don't redirect if we have cache
+                console.warn('[Schedule] Token expired');
                 wx.removeStorageSync('user_token');
-                wx.showToast({ title: '登录过期', icon: 'none' });
-                setTimeout(() => wx.redirectTo({ url: '/pages/login/login' }), 1000);
+                if (this.data.allCourses.length === 0) {
+                    wx.showToast({ title: '登录过期', icon: 'none' });
+                    setTimeout(() => wx.redirectTo({ url: '/pages/login/login' }), 1000);
+                }
             } else {
-                wx.showToast({ title: res.data.msg || '获取失败', icon: 'none' });
+                if (showLoading) {
+                    wx.showToast({ title: res.data.msg || '获取失败', icon: 'none' });
+                }
             }
         } catch (err) {
             console.error(err);
-            wx.showToast({ title: '网络请求错误', icon: 'none' });
+            if (showLoading) {
+                wx.showToast({ title: '网络请求错误', icon: 'none' });
+            }
         } finally {
             wx.hideNavigationBarLoading();
             this.setData({ loading: false });
