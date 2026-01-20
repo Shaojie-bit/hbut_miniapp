@@ -15,16 +15,23 @@ const PASTEL_COLORS = [
 Page({
     data: {
         currentWeek: 1,
-        currentWeekIndex: 0, // for picker (0-based)
+        currentWeekIndex: 0, // for picker and swiper (0-based)
         weeksArray: [], // ["第1周", "第2周", ...]
         semester: '2025-2026-1', // Default
         semesterIndex: 0, // for picker
-        semesterArray: ['2025-2026-1', '2025-2026-2', '2024-2025-1', '2024-2025-2'], // Semester options
+        semesterArray: ['2025-2026-1', '2025-2026-2', '2024-2025-1', '2024-2025-2'],
+        // Semester start dates (Monday of first week)
+        semesterStartDates: {
+            '2025-2026-1': '2025-09-01',
+            '2025-2026-2': '2026-02-23',
+            '2024-2025-1': '2024-09-02',
+            '2024-2025-2': '2025-02-24'
+        },
         allCourses: [],
         weekCourses: [],
         days: [
-            { name: '周一' }, { name: '周二' }, { name: '周三' }, { name: '周四' },
-            { name: '周五' }, { name: '周六' }, { name: '周日' }
+            { name: '周一', date: '' }, { name: '周二', date: '' }, { name: '周三', date: '' }, { name: '周四', date: '' },
+            { name: '周五', date: '' }, { name: '周六', date: '' }, { name: '周日', date: '' }
         ],
         currentMonth: new Date().getMonth() + 1,
         loading: true
@@ -32,6 +39,7 @@ Page({
 
     onLoad() {
         this.initWeeks();
+        this.calculateCurrentWeek(); // Calculate current week first
 
         // 1. Load cached timetable first (instant display)
         const cachedTimetable = wx.getStorageSync('cached_timetable');
@@ -48,7 +56,10 @@ Page({
             this.filterCoursesForWeek(this.data.currentWeek);
         }
 
-        // 2. Then check login and refresh in background
+        // 2. Update dates display for current week
+        this.updateDaysWithDates(this.data.currentWeek);
+
+        // 3. Then check login and refresh in background
         this.checkLoginAndFetch();
     },
 
@@ -67,13 +78,87 @@ Page({
         this.setData({ weeksArray: arr });
     },
 
+    // Calculate current week based on semester start date
+    calculateCurrentWeek() {
+        const startDateStr = this.data.semesterStartDates[this.data.semester];
+        if (!startDateStr) return;
+
+        const startDate = new Date(startDateStr);
+        const today = new Date();
+
+        // Calculate the difference in days
+        const diffTime = today.getTime() - startDate.getTime();
+        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+        // Calculate week number (1-based)
+        let weekNum = Math.floor(diffDays / 7) + 1;
+
+        // Clamp to valid range
+        weekNum = Math.max(1, Math.min(25, weekNum));
+
+        this.setData({
+            currentWeek: weekNum,
+            currentWeekIndex: weekNum - 1
+        });
+    },
+
     onWeekChange(e) {
         const week = parseInt(e.detail.value) + 1;
         this.setData({
             currentWeekIndex: e.detail.value,
             currentWeek: week
         });
+        this.updateDaysWithDates(week);
         this.filterCoursesForWeek(week);
+    },
+
+    // Swiper slide change handler
+    onSwiperChange(e) {
+        if (e.detail.source === 'touch') {
+            const newIndex = e.detail.current;
+            const newWeek = newIndex + 1;
+            this.setData({
+                currentWeekIndex: newIndex,
+                currentWeek: newWeek
+            });
+            this.updateDaysWithDates(newWeek);
+            this.filterCoursesForWeek(newWeek);
+        }
+    },
+
+    // Calculate dates for each day of the week
+    updateDaysWithDates(week) {
+        const startDateStr = this.data.semesterStartDates[this.data.semester];
+        if (!startDateStr) return;
+
+        const startDate = new Date(startDateStr);
+        // Offset to Monday of the given week
+        const weekOffset = (week - 1) * 7;
+
+        const newDays = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'].map((name, dayIndex) => {
+            const date = new Date(startDate);
+            date.setDate(startDate.getDate() + weekOffset + dayIndex);
+
+            const month = date.getMonth() + 1;
+            const day = date.getDate();
+            const today = new Date();
+            const isToday = date.toDateString() === today.toDateString();
+
+            return {
+                name,
+                date: `${month}/${day}`,
+                isToday
+            };
+        });
+
+        // Update month display (use Monday's month)
+        const mondayDate = new Date(startDate);
+        mondayDate.setDate(startDate.getDate() + weekOffset);
+
+        this.setData({
+            days: newDays,
+            currentMonth: mondayDate.getMonth() + 1
+        });
     },
 
     onSemesterChange(e) {
@@ -85,6 +170,8 @@ Page({
             allCourses: [], // Clear old data
             weekCourses: []
         });
+        this.calculateCurrentWeek(); // Recalculate current week for new semester
+        this.updateDaysWithDates(this.data.currentWeek);
         this.fetchTimetable(); // Reload with new semester
     },
 
@@ -132,7 +219,7 @@ Page({
 
             if (res.statusCode === 200 && res.data.code === 200) {
                 const rawList = res.data.data;
-                const serverWeek = res.data.current_week || 1;
+                const serverWeek = res.data.current_week || this.data.currentWeek;
 
                 // Save raw data to cache
                 wx.setStorageSync('cached_timetable', rawList);
@@ -148,11 +235,13 @@ Page({
                     allCourses: processed,
                     currentWeek: serverWeek,
                     currentWeekIndex: serverWeek - 1,
-                    semester: res.data.semester
+                    semester: res.data.semester || this.data.semester
                 });
 
+                // Update dates display after setting current week from server
+                this.updateDaysWithDates(serverWeek);
                 this.filterCoursesForWeek(serverWeek);
-                console.log('[Schedule] Data refreshed from server');
+                console.log('[Schedule] Data refreshed from server, current week:', serverWeek);
 
             } else if (res.data.code === 401) {
                 // Token expired - but don't redirect if we have cache

@@ -2,9 +2,12 @@
 
 湖北工业大学教务系统微信小程序，支持成绩查询、课表查看和排名统计功能。
 
+> **🌟 特别特性**: 内置 Cloudflare 隧道代理方案，彻底解决学校 IP 封禁问题，实现极速稳定的访问体验。
+
 ## ✨ 功能特性
 
-- 🔐 **智能登录** - OCR 自动识别验证码，3次失败后手动输入
+- 🛡️ **防封禁** - 采用 Cloudflare Workers 作为出站代理，隐藏服务器真实 IP
+- 🔐 **智能登录** - OCR 自动识别验证码，高准确率，失败自动降级手动模式
 - 📊 **成绩查询** - 按学期分组展示，支持离线缓存
 - 📅 **课表查看** - 周视图课表，支持学期/周次切换
 - 🏆 **排名查询** - GPA、专业排名、班级排名一目了然
@@ -17,77 +20,80 @@ hbut/
 ├── backend/                    # 后端服务
 │   ├── cjcx+pm.py            # FastAPI 后端主程序
 │   ├── requirements.txt       # Python 依赖
-│   └── 部署指南.md            # 服务器部署文档
+│   └── sessions.db            # SQLite 会话存储 (自动生成)
+│
+├── workers/                    # 代理服务
+│   └── proxy.js               # Cloudflare Worker 脚本
 │
 └── wxxcx/                     # 微信小程序前端
     ├── app.js                 # 小程序入口
-    ├── app.json               # 全局配置 (Tab Bar)
-    ├── app.wxss               # 全局样式
-    ├── utils/
-    │   └── config.js          # API 地址配置
-    ├── pages/
-    │   ├── login/             # 登录页
-    │   ├── index/             # 成绩页
-    │   └── schedule/          # 课表页
-    └── assets/                # 图标资源
+    ├── utils/config.js        # API 地址配置
+    └── pages/                 # 各页面源码
 ```
 
 ## 🚀 快速开始
 
-### 后端部署
+### 1. 部署 Cloudflare Worker (关键)
 
-1. **安装依赖**
-   ```bash
-   cd cursor
-   pip install -r requirements.txt
-   ```
+为了防止 IP 被封，我们首先部署代理服务：
+1.  注册 Cloudflare 账号，创建一个新的 Worker。
+2.  将 `workers/proxy.js` 的内容复制到 Worker 中并保存。
+3.  **强烈建议**: 绑定自定义域名 (如 `hbut-worker.yourdomain.com`) 并在 Routes 中配置路由。
 
-2. **运行服务**
-   ```bash
-   python cjcx+pm.py
-   ```
-   服务将在 `http://0.0.0.0:8000` 启动
+### 2. 后端部署
 
-3. **生产部署** - 参考 `部署指南.md`
+1.  **安装依赖**
+    ```bash
+    cd backend
+    pip install -r requirements.txt
+    ```
 
-### 小程序配置
+2.  **配置代理**
+    打开 `backend/cjcx+pm.py`，修改 `CF_PROXY_URL`：
+    ```python
+    CF_PROXY_URL = "https://hbut-worker.yourdomain.com/"
+    ```
 
-1. **修改 API 地址**  
-   编辑 `wxxcx/utils/config.js`：
-   ```javascript
-   module.exports = {
-     BASE_URL: 'https://your-domain.com'  // 替换为你的服务器地址
-   };
-   ```
+3.  **运行服务**
+    ```bash
+    python cjcx+pm.py
+    ```
+    服务将在 `http://0.0.0.0:8000` 启动
 
-2. **导入微信开发者工具**  
-   打开微信开发者工具，导入 `wxxcx` 目录
+### 3. 小程序配置
 
-3. **配置服务器域名**  
-   在小程序后台「开发设置」中添加服务器域名
+1.  **修改 API 地址**  
+    编辑 `wxxcx/utils/config.js`：
+    ```javascript
+    module.exports = {
+      BASE_URL: 'https://your-backend-server.com'  // 你的 Python 后端地址
+    };
+    ```
 
-## 🔧 API 接口
+2.  **导入开发工具**  
+    使用微信开发者工具导入 `wxxcx` 目录即可运行。
+
+## 🔧 API 接口 (后端 -> 代理 -> 学校)
 
 | 接口 | 方法 | 说明 |
 |------|------|------|
-| `/api/captcha` | GET | 获取验证码 |
-| `/api/login` | POST | 登录 (支持 OCR 自动登录) |
+| `/api/captcha` | GET | 手动获取验证码 (走代理) |
+| `/api/login` | POST | 登录 (优先 OCR，支持重试) |
 | `/api/grades` | POST | 查询成绩 |
 | `/api/timetable` | POST | 查询课表 |
-| `/api/rankings` | POST | 查询排名 |
 
 ## 📋 技术栈
 
-- **后端**: Python 3.8+, FastAPI, ddddocr, BeautifulSoup4
-- **前端**: 微信小程序原生框架 (WXML/WXSS/JS)
-- **加密**: AES-CBC (密码加密)
+- **基础设施**: Cloudflare Workers (Tunnel Proxy)
+- **后端**: Python 3.8+, FastAPI, ddddocr, SQLite
+- **前端**: 微信小程序原生框架
+- **加密**: AES-CBC + Base64
 
 ## ⚠️ 注意事项
 
-1. 本项目仅供学习交流使用
-2. 请勿用于任何商业用途
-3. 登录凭证仅存储于本地，后端不保存密码
-4. 生产环境建议使用 Redis 替代内存缓存
+1. **Cloudflare 配置**: 务必确保 Worker 的 Custom Domain 和 Routes 配置正确，否则会报 404。
+2. **生产环境**: 建议使用 Nginx 反向代理 Python 后端，并配置 SSL 证书。
+3. **数据安全**: 本项目仅供学习交流，不保存任何用户敏感数据（密码仅在内存中转发）。
 
 ## 📄 开源协议
 

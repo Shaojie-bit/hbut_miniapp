@@ -8,6 +8,7 @@
 
 为湖北工业大学学生提供移动端教务查询服务，核心功能：
 - **自动登录** - OCR 识别验证码，失败后回退手动输入
+- **防封禁代理** - 通过 Cloudflare Workers 隧道代理访问教务系统，隐藏真实 IP
 - **成绩查询** - 按学期分组，支持离线缓存
 - **课表查看** - 周视图，支持课程合并显示
 - **排名查询** - GPA、专业/班级排名
@@ -18,7 +19,8 @@
 
 | 层级 | 技术 | 说明 |
 |------|------|------|
-| **后端** | Python 3.8+, FastAPI | `cursor/cjcx+pm.py` |
+| **后端** | Python 3.8+, FastAPI | `backend/cjcx+pm.py` |
+| **代理** | Cloudflare Workers | 负责转发请求，解决 IP 封禁问题 (Tunnel Mode) |
 | **OCR** | ddddocr | 验证码自动识别 |
 | **爬虫** | requests, BeautifulSoup4 | 教务系统数据抓取 |
 | **加密** | PyCryptodome (AES-CBC) | 密码加密 |
@@ -35,21 +37,20 @@ hbut/
 │   ├── requirements.txt         # Python 依赖
 │   └── nginx-hbut.conf          # Nginx 配置示例
 │
+├── workers/                      # 【Cloudflare Workers】
+│   └── proxy.js                 # 代理脚本 (部署到 Cloudflare)
+│
 ├── wxxcx/                       # 【微信小程序前端】
 │   ├── app.js                   # 入口，globalData 定义
 │   ├── app.json                 # 页面注册 + TabBar 配置
 │   ├── app.wxss                 # 全局 CSS 变量
 │   ├── utils/
-│   │   └── config.js            # BASE_URL 配置 (重要!)
+│   │   └── config.js            # BASE_URL 配置 (指向你的 Python 后端)
 │   ├── pages/
 │   │   ├── login/               # 登录页 (OCR 自动 + 手动回退)
 │   │   ├── index/               # 成绩页 (排名卡片 + 学期分组)
 │   │   └── schedule/            # 课表页 (周视图 + 课程合并)
 │   └── assets/                  # Tab 图标
-│
-└── 没用了/                      # 【已弃用的调试文件】
-    ├── cjcx.py                  # 旧版后端 (仅供参考)
-    └── index.html               # 本地调试 HTML
 ```
 
 ---
@@ -58,34 +59,20 @@ hbut/
 
 ### 后端 (Python/FastAPI)
 
-- **会话管理**: 使用内存字典 `FAKE_REDIS` 存储 session
+- **网络架构**: Python 后端不直接访问学校服务器，而是通过 Cloudflare Worker 代理。
   ```python
-  FAKE_REDIS[f"user:{token}"] = {"cookies": ..., "xhid": ..., "stu_id": ...}
+  CF_PROXY_URL = "https://hbut-worker.zmj888.asia/"
+  # 请求流程: Python -> Cloudflare Worker -> School Server
   ```
-- **API 响应格式**: 统一返回 `{"code": 200/401/500, "data": ..., "msg": ...}`
-- **错误处理**: 直接返回错误码，不抛异常
-  ```python
-  if not user_data: return {"code": 401, "msg": "请重新登录"}
-  ```
-- **HTML 解析**: `BeautifulSoup` + `.find()` 方式提取字段
+- **请求封装**: 使用 `cf_request` 函数统一发送代理请求，自动处理 `headers_list` (解决 Set-Cookie 覆盖问题) 和 `body_base64` (处理验证码图片)。
+- **会话管理**: 使用 SQLite (`sessions.db`) 持久化存储用户 Session 和验证码会话。
+- **OCR 逻辑**: 优先自动识别，连续失败3次后，生成新的验证码会话供前端手动输入。
 
 ### 前端 (微信小程序)
 
 - **API 调用**: Promise 封装 `wx.request`
-  ```javascript
-  const res = await new Promise((resolve, reject) => {
-      wx.request({ url, method, data, success: resolve, fail: reject });
-  });
-  ```
 - **状态管理**: 页面级 `data` + `wx.setStorageSync` 持久化
-- **Token 存储**: `wx.getStorageSync('user_token')`
-- **页面跳转**: TabBar 页用 `wx.switchTab`，非 Tab 页用 `wx.redirectTo`
-
-### 课程合并算法
-
-后端和前端各有一次合并：
-1. **后端合并** (`cjcx+pm.py`): 按 `raw_zc` (周次描述) 合并
-2. **前端合并** (`schedule.js`): 按当前周筛选后再合并（解决不同周次范围的课程）
+- **登录交互**: 默认尝试自动登录 -> 失败提示并显示验证码 -> 用户手动输入 -> 重新提交。
 
 ---
 
@@ -95,30 +82,21 @@ hbut/
 
 1. **登录返回码**:
    - `200` = 成功
-   - `429` = OCR 失败，需手动输入验证码
+   - `429` = OCR 失败，需手动输入验证码 (会自动返回新验证码图片)
    - `401` = 密码错误或会话过期
+   - `403` = 请求过于频繁 (限流)
 
-2. **成绩字段名**: 后端必须返回 `course_name`，前端 `index.wxml` 依赖此字段
+2. **代理通信协议**:
+   - Worker 返回的数据必须包含 `headers_list` 数组，而不是单一的 headers 对象，以防止 Set-Cookie 丢失。
+   - 二进制数据 (验证码) 必须通过 `body_base64` 字段返回。
 
-3. **课表 djs 字段**: 教务系统返回的 `djs` 是**结束节次**，不是持续时长
-   ```python
-   step_span = max(1, end_sec - start_sec + 1)  # 正确
-   step = djs  # 错误!
-   ```
-
-4. **xhid 提取**: 必须访问 `?xnxq=2025-2026-1` 参数才能获取 xhid
+3. **URL 编码**:
+   - 向 Worker 发送 POST 时的 `body` 必须使用 `urllib.parse.urlencode` 编码，防止 `+` 号等特殊字符被吞。
 
 ### 禁止事项
 
-- ❌ 不要使用 `wx.reLaunch` 跳转到 TabBar 页面（会报错）
-- ❌ 不要在后端存储明文密码
-- ❌ 不要修改 `FAKE_REDIS` 的 key 格式 (`user:xxx`, `session:xxx`)
-
-### 推荐
-
-- ✅ 修改后端后务必重启服务
-- ✅ 前端调试时清除小程序缓存
-- ✅ 生产环境将 `FAKE_REDIS` 替换为 Redis
+- ❌ 不要跳过 Cloudflare Worker 直接访问学校 IP (会被封禁)。
+- ❌ 不要修改 `cf_request` 中的 Cookie 处理逻辑，除非你通过了完整测试。
 
 ---
 
@@ -126,10 +104,9 @@ hbut/
 
 | 现象 | 原因 | 解决 |
 |------|------|------|
-| 课表显示"登录过期" | `xhid` 未正确提取 | 检查 `TIMETABLE_PAGE_URL` 和参数 |
-| 成绩无课程名 | 后端返回 `name` 而非 `course_name` | 修改后端字段名 |
-| 登录后跳回登录页 | Token 未保存或被清除 | 检查 `wx.setStorageSync` |
-| 课程卡片未合并 | 前端合并算法缺失 | 检查 `filterCoursesForWeek` |
+| 验证码一直提示错误 | Set-Cookie 被覆盖或丢失 | 检查 Worker 是否返回 `headers_list`，后端是否正确解析 |
+| 登录返回 404 | Worker 路由没配对 | 检查 Cloudflare Custom Domain 和 Routes |
+| 课表/成绩为空 | 代理网络超时或学校系统维护 | 检查 Cloudflare 日志或学校官网状态 |
 
 ---
 
@@ -137,9 +114,7 @@ hbut/
 
 | 需求 | 文件 |
 |------|------|
+| 修改代理地址 | `backend/cjcx+pm.py` (CF_PROXY_URL) |
 | 修改 API 地址 | `wxxcx/utils/config.js` |
-| 添加新 API | `cursor/cjcx+pm.py` |
-| 修改登录逻辑 | `wxxcx/pages/login/login.js` |
-| 修改课表 UI | `wxxcx/pages/schedule/schedule.wxml` |
-| 修改成绩 UI | `wxxcx/pages/index/index.wxml` |
-| 修改 Tab 配置 | `wxxcx/app.json` |
+| 修改代理脚本 | `workers/proxy.js` |
+| 部署指南 | `backend/部署指南.md` |

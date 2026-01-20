@@ -18,51 +18,66 @@
     </view>
   </view>
 
-  <!-- Week Header (Mon-Sun) -->
+  <!-- Week Header (Mon-Sun) with Dates -->
   <view class="week-header">
     <view class="header-cell month-col">{{currentMonth}}月</view>
     <block wx:for="{{days}}" wx:key="index">
       <view class="header-cell {{item.isToday ? 'today' : ''}}">
         <text class="day-name">{{item.name}}</text>
-        <!-- We could add dynamic date here like '12/5' later -->
+        <text class="day-date">{{item.date}}</text>
       </view>
     </block>
   </view>
 
-  <!-- Scrollable Timetable Area -->
-  <scroll-view scroll-y class="timetable-scroll">
-    <view class="timetable-body">
-      <!-- Sidebar: 1-12 periods -->
-      <view class="sidebar">
-        <block wx:for="{{[1,2,3,4,5,6,7,8,9,10,11,12]}}" wx:key="*this">
-          <view class="sidebar-cell">{{item}}</view>
-        </block>
-      </view>
+  <!-- Swiper for Week Navigation -->
+  <swiper 
+    class="week-swiper" 
+    current="{{currentWeekIndex}}" 
+    bindchange="onSwiperChange"
+    duration="300"
+    circular="{{false}}"
+  >
+    <block wx:for="{{weeksArray}}" wx:key="index" wx:for-index="weekIdx">
+      <swiper-item>
+        <!-- Scrollable Timetable Area -->
+        <scroll-view scroll-y class="timetable-scroll">
+          <view class="timetable-body">
+            <!-- Sidebar: 1-12 periods -->
+            <view class="sidebar">
+              <block wx:for="{{[1,2,3,4,5,6,7,8,9,10,11,12]}}" wx:key="*this">
+                <view class="sidebar-cell">{{item}}</view>
+              </block>
+            </view>
 
-      <!-- Course Grid -->
-      <view class="course-grid">
-         <!-- Horizontal Lines for guidance -->
-         <block wx:for="{{[1,2,3,4,5,6,7,8,9,10,11,12]}}" wx:key="*this">
-            <view class="grid-row-line" style="top: {{(item-1)*110}}rpx;"></view>
-         </block>
+            <!-- Course Grid -->
+            <view class="course-grid">
+               <!-- Horizontal Lines for guidance -->
+               <block wx:for="{{[1,2,3,4,5,6,7,8,9,10,11,12]}}" wx:key="*this">
+                  <view class="grid-row-line" style="top: {{(item-1)*110}}rpx;"></view>
+               </block>
 
-         <!-- Course Cards -->
-         <block wx:for="{{weekCourses}}" wx:key="index">
-           <view class="course-card-container" 
-                 style="left: {{(item.day-1)*100/7}}%; top: {{(item.start-1)*110}}rpx; height: {{item.step*110}}rpx;"
-                 bindtap="showCourseDetail" data-course="{{item}}">
-              <view class="course-card" style="background-color: {{item.color}};">
-                 <text class="course-name">{{item.name}}</text>
-                 <text class="course-room">@{{item.room}}</text>
-              </view>
-           </view>
-         </block>
-         
-         <!-- Placeholder if empty -->
-         <view wx:if="{{weekCourses.length === 0 && !loading}}" class="empty-state">
-            <text>本周没有课哦 ~</text>
-         </view>
-      </view>
-    </view>
-  </scroll-view>
+               <!-- Course Cards (only show if this is current week swiper) -->
+               <block wx:if="{{weekIdx === currentWeekIndex}}">
+                 <block wx:for="{{weekCourses}}" wx:key="index">
+                   <view class="course-card-container" 
+                        style="left: {{(item.day-1)*100/7}}%; top: {{(item.start-1)*110}}rpx; height: {{item.step*110}}rpx;"
+                        bindtap="showCourseDetail" data-course="{{item}}">
+                     <view class="course-card" style="background-color: {{item.color}};">
+                        <text class="course-name">{{item.name}}</text>
+                        <text class="course-room">@{{item.room}}</text>
+                     </view>
+                   </view>
+                 </block>
+               </block>
+               
+               <!-- Placeholder if empty -->
+               <view wx:if="{{weekIdx === currentWeekIndex && weekCourses.length === 0 && !loading}}" class="empty-state">
+                  <text>本周没有课哦 ~</text>
+               </view>
+            </view>
+          </view>
+        </scroll-view>
+      </swiper-item>
+    </block>
+  </swiper>
 </view>

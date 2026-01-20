@@ -91,11 +91,28 @@ page {
 
 .day-name {
   font-weight: 500;
+  font-size: 24rpx;
+}
+
+.day-date {
+  font-size: 20rpx;
+  color: var(--text-secondary);
+  margin-top: 2rpx;
 }
 
 .today .day-name {
   color: var(--primary-color);
   font-weight: 800;
+}
+
+.today .day-date {
+  color: var(--primary-color);
+}
+
+/* --- Week Swiper --- */
+.week-swiper {
+  flex: 1;
+  width: 100%;
 }
 
 /* --- Timetable Body --- */

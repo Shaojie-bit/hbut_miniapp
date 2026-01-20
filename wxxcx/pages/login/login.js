@@ -9,12 +9,11 @@ Page({
         captchaImg: '',
         tempToken: '',
         loading: false,
+        captchaLoading: false,
         needCaptcha: false // Default: Auto-Login mode
     },
 
     onLoad() {
-        // No more initial loadCaptcha()
-
         // Auto-fill credentials
         const storedUser = wx.getStorageSync('username');
         const storedPwd = wx.getStorageSync('password');
@@ -27,6 +26,7 @@ Page({
     },
 
     async loadCaptcha() {
+        this.setData({ captchaLoading: true });
         try {
             const res = await new Promise((resolve, reject) => {
                 wx.request({
@@ -37,19 +37,34 @@ Page({
                 });
             });
 
+            console.log('[Captcha] 响应:', res.data);
+
             if (res.statusCode === 200 && res.data.code === 200) {
                 this.setData({
                     captchaImg: res.data.data.image,
                     tempToken: res.data.data.token,
                     needCaptcha: true
                 });
+            } else if (res.data.code === 503) {
+                wx.showModal({
+                    title: '服务暂不可用',
+                    content: res.data.msg || '服务器暂时无法使用，请稍后再试',
+                    showCancel: false
+                });
             } else {
-                wx.showToast({ title: '验证码获取失败', icon: 'none' });
+                wx.showToast({ title: res.data.msg || '验证码获取失败', icon: 'none' });
             }
         } catch (err) {
-            console.error(err);
+            console.error('[Captcha] 错误:', err);
             wx.showToast({ title: '网络连接失败', icon: 'none' });
+        } finally {
+            this.setData({ captchaLoading: false });
         }
+    },
+
+    // Tap on captcha image to refresh
+    onCaptchaTap() {
+        this.loadCaptcha();
     },
 
     async handleLogin() {
@@ -57,26 +72,27 @@ Page({
             return wx.showToast({ title: '请输入账号密码', icon: 'none' });
         }
 
-        // If captcha is shown, user must fill it
+        // If manual mode is active, user must enter captcha
         if (this.data.needCaptcha && !this.data.captcha) {
             return wx.showToast({ title: '请输入验证码', icon: 'none' });
         }
 
         this.setData({ loading: true });
 
-        // Payload: If needCaptcha is false, we send only user/pass, backend does OCR
+        // Build payload
         const payload = {
             username: this.data.username,
             password: this.data.password
         };
 
-        // Add captcha data if needed
+        // Add captcha if in manual mode
         if (this.data.needCaptcha) {
             payload.token = this.data.tempToken;
             payload.captcha = this.data.captcha;
         }
 
         try {
+            console.log('[Login] 发送登录请求(自动/手动)...');
             const res = await new Promise((resolve, reject) => {
                 wx.request({
                     url: `${config.BASE_URL}/api/login`,
@@ -86,6 +102,8 @@ Page({
                     fail: reject
                 });
             });
+
+            console.log('[Login] 响应:', res.data);
 
             if (res.statusCode === 200 && res.data.code === 200) {
                 // Success
@@ -98,29 +116,31 @@ Page({
 
                 wx.showToast({ title: '登录成功', icon: 'success' });
                 setTimeout(() => {
-                    // Redirect to schedule tab
                     wx.switchTab({ url: '/pages/schedule/schedule' });
                 }, 1000);
 
-            } else if (res.data.code === 429 || res.data.data) {
-                // Auto-Login Failed (code 429 from backend), Backend requests Manual Input
+            } else if (res.data.code === 429) {
+                // Auto-login failed -> Switch to manual mode
+                wx.showToast({ title: '自动识别失败，请手动输入', icon: 'none' });
                 this.setData({
                     needCaptcha: true,
-                    captchaImg: res.data.data.image,
                     tempToken: res.data.data.token,
-                    captcha: '' // Clear input
+                    captchaImg: res.data.data.image,
+                    captcha: ''
                 });
-                wx.showToast({ title: res.data.msg || '请手动输入验证码', icon: 'none', duration: 3000 });
 
             } else {
                 // Other errors (Wrong Password, etc)
                 wx.showToast({ title: res.data.msg || '登录失败', icon: 'none' });
-                // If we were already in manual mode, refresh captcha
-                if (this.data.needCaptcha) this.loadCaptcha();
+                // If we were in manual mode, refresh captcha
+                if (this.data.needCaptcha) {
+                    this.setData({ captcha: '' });
+                    this.loadCaptcha();
+                }
             }
         } catch (err) {
-            console.error(err);
-            wx.showToast({ title: '请求超时或错误', icon: 'none' });
+            console.error('[Login] 错误:', err);
+            wx.showToast({ title: '请求超时或网络错误', icon: 'none' });
         } finally {
             this.setData({ loading: false });
         }
