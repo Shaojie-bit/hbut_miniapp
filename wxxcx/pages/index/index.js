@@ -24,21 +24,28 @@ Page({
 
   checkLoginAndRefresh() {
     const token = wx.getStorageSync('user_token');
+    const cachedGrades = wx.getStorageSync('cached_grades');
 
     if (token) {
       // If we have a token, try to refresh data silently
       this.fetchGrades(true); // true = silent refresh
+      this.setData({ needLogin: false });
     } else {
       // No token?
-      const cachedGrades = wx.getStorageSync('cached_grades');
       if (!cachedGrades) {
-        // No token AND No cache -> Force Login
-        wx.redirectTo({ url: '/pages/login/login' });
+        // No token AND No cache -> Show Login Button (Don't redirect)
+        this.setData({ needLogin: true, loading: false });
+        // wx.showToast({ title: '请先登录', icon: 'none' });
       } else {
         // No token but have cache -> Offline Mode (Stay here)
+        this.setData({ needLogin: true }); // Still need login to refresh, but show cache
         wx.showToast({ title: '离线模式', icon: 'none' });
       }
     }
+  },
+
+  goToLogin() {
+    wx.navigateTo({ url: '/pages/login/login' });
   },
 
   async fetchGrades(isSilent = false) {

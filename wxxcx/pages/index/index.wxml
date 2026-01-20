@@ -77,10 +77,14 @@
       </view>
     </block>
     
-    <!-- Empty State -->
+    <!-- Empty State / Login Prompt -->
     <view wx:if="{{semesterGroups.length === 0}}" class="empty-state">
       <image src="/assets/empty.png" mode="widthFix" class="empty-img"></image>
-      <text>加载中或暂无数据...</text>
+      <text wx:if="{{!needLogin}}">加载中或暂无数据...</text>
+      <view wx:else class="login-prompt">
+         <text>查看成绩需要验证身份</text>
+         <button class="login-btn" bindtap="goToLogin" type="primary" size="mini" style="margin-top: 20rpx;">立即登录</button>
+      </view>
     </view>
     
     <view class="footer-spacing"></view>

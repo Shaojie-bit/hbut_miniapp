@@ -1,4 +1,5 @@
 const config = require('../../utils/config.js');
+const Auth = require('../../utils/auth.js'); // Import Auth
 const app = getApp();
 
 const PASTEL_COLORS = [
@@ -34,14 +35,16 @@ Page({
             { name: '周五', date: '' }, { name: '周六', date: '' }, { name: '周日', date: '' }
         ],
         currentMonth: new Date().getMonth() + 1,
-        loading: true
+        loading: true,
+        updateStatus: '', // 'updating', 'success', 'fail'
+        updateStatusText: ''
     },
 
     onLoad() {
         this.initWeeks();
-        this.calculateCurrentWeek(); // Calculate current week first
+        this.calculateCurrentWeek();
 
-        // 1. Load cached timetable first (instant display)
+        // 1. Instant rendering from cache
         const cachedTimetable = wx.getStorageSync('cached_timetable');
         if (cachedTimetable) {
             const processed = cachedTimetable.map(c => ({
@@ -56,17 +59,48 @@ Page({
             this.filterCoursesForWeek(this.data.currentWeek);
         }
 
-        // 2. Update dates display for current week
         this.updateDaysWithDates(this.data.currentWeek);
 
-        // 3. Then check login and refresh in background
-        this.checkLoginAndFetch();
+        // 2. Silent Login & Update
+        this.performSilentUpdate();
     },
 
     onShow() {
-        // If we switch back and no data, retry
-        if (!this.data.allCourses.length) {
-            this.checkLoginAndFetch();
+        // Optional: Refresh if cache is empty or it's been a while? 
+        // For now, let onLoad handle the main update. 
+        // If user manually logged in from Login page, we might want to refresh.
+        if (app.globalData.isLoggedIn && !this.data.allCourses.length) {
+            this.fetchTimetable();
+        }
+    },
+
+    async performSilentUpdate() {
+        this.setData({ updateStatus: 'updating', updateStatusText: '正在更新课表...' });
+
+        // Try silent login
+        const loginRes = await Auth.loginSilently();
+
+        if (loginRes.success) {
+            // Login success, fetch data
+            await this.fetchTimetable(false); // don't show full screen loading
+            this.setData({ updateStatus: 'success', updateStatusText: '已更新最新课表' });
+            setTimeout(() => {
+                this.setData({ updateStatus: '' });
+            }, 2000);
+        } else {
+            // Login failed (need captcha or wrong password)
+            const isOffline = !Auth.hasCredentials();
+            if (isOffline) {
+                this.setData({ updateStatus: 'fail', updateStatusText: '未登录，仅显示缓存 (点此登录)' });
+            } else {
+                this.setData({ updateStatus: 'fail', updateStatusText: '更新失败，点此重新登录' });
+            }
+        }
+    },
+
+    handleStatusTap() {
+        if (this.data.updateStatus === 'fail') {
+            wx.navigateTo({ url: '/pages/login/login' });
         }
     },
 
@@ -175,28 +209,6 @@ Page({
         this.fetchTimetable(); // Reload with new semester
     },
 
-    checkLoginAndFetch() {
-        const token = wx.getStorageSync('user_token');
-        const hasCredentials = wx.getStorageSync('username') && wx.getStorageSync('password');
-        const hasCache = this.data.allCourses.length > 0;
-
-        console.log('Schedule Page Token Check:', token, 'HasCache:', hasCache);
-
-        if (!token && !hasCredentials) {
-            // No token AND no saved credentials - must login
-            if (!hasCache) {
-                wx.showToast({ title: '请先登录', icon: 'none' });
-                setTimeout(() => {
-                    wx.redirectTo({ url: '/pages/login/login' });
-                }, 1500);
-            }
-            return;
-        }
-
-        // If we have token or credentials, try to fetch (silently if cache exists)
-        this.fetchTimetable(!hasCache); // showLoading = true only if no cache
-    },
-
     async fetchTimetable(showLoading = true) {
         if (showLoading) {
             wx.showNavigationBarLoading();
@@ -244,12 +256,13 @@ Page({
                 console.log('[Schedule] Data refreshed from server, current week:', serverWeek);
 
             } else if (res.data.code === 401) {
-                // Token expired - but don't redirect if we have cache
+                // Token expired
                 console.warn('[Schedule] Token expired');
                 wx.removeStorageSync('user_token');
-                if (this.data.allCourses.length === 0) {
-                    wx.showToast({ title: '登录过期', icon: 'none' });
-                    setTimeout(() => wx.redirectTo({ url: '/pages/login/login' }), 1000);
+                if (showLoading) { // If user manually clicked refresh
+                    this.setData({ updateStatus: 'fail', updateStatusText: '会话过期，请重新登录' });
+                } else {
+                    this.setData({ updateStatus: 'fail', updateStatusText: '更新失败，点此登录' });
                 }
             } else {
                 if (showLoading) {

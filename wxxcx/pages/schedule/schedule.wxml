@@ -1,4 +1,9 @@
 <view class="container">
+  <!-- Login/Update Status Bar -->
+  <view class="status-bar {{updateStatus}}" wx:if="{{updateStatus}}" bindtap="handleStatusTap" 
+        style="width: 100%; text-align: center; font-size: 24rpx; padding: 10rpx 0; background: {{updateStatus=='fail'?'#fee2e2':'#e0e7ff'}}; color: {{updateStatus=='fail'?'#dc2626':'#4338ca'}};">
+    <text>{{updateStatusText}}</text>
+  </view>
   <!-- Top Bar: Week & Semester Selector -->
   <view class="top-bar">
     <view class="week-selector">

@@ -115,8 +115,16 @@ Page({
                 app.globalData.userToken = userToken;
 
                 wx.showToast({ title: '登录成功', icon: 'success' });
+
+                // Return to previous page if possible (e.g. from Schedule or Grades)
                 setTimeout(() => {
-                    wx.switchTab({ url: '/pages/schedule/schedule' });
+                    const pages = getCurrentPages();
+                    if (pages.length > 1) {
+                        wx.navigateBack();
+                    } else {
+                        // Fallback: Go to Home (Schedule)
+                        wx.switchTab({ url: '/pages/schedule/schedule' });
+                    }
                 }, 1000);
 
             } else if (res.data.code === 429) {
