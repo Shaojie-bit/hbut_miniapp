@@ -1,0 +1,275 @@
+/* pages/index/index.wxss */
+page {
+  /* Using global vars from app.wxss */
+  background-color: var(--bg-color);
+}
+
+.container {
+  padding: 0;
+  width: 100%;
+}
+
+/* --- Header Section --- */
+.header-section {
+  background: white;
+  padding: 30rpx 40rpx 40rpx 40rpx;
+  border-bottom-left-radius: 40rpx;
+  border-bottom-right-radius: 40rpx;
+  box-shadow: var(--shadow-md);
+  margin-bottom: 30rpx;
+  position: relative;
+  z-index: 10;
+}
+
+.welcome-text {
+  margin-bottom: 30rpx;
+}
+
+.greeting {
+  display: block;
+  font-size: 40rpx;
+  font-weight: 800;
+  color: var(--text-main);
+  margin-bottom: 5rpx;
+}
+
+.sub-greeting {
+  font-size: 28rpx;
+  color: var(--text-secondary);
+}
+
+/* --- Rank Card --- */
+.rank-card {
+  position: relative;
+  width: 100%;
+  border-radius: 24rpx;
+  overflow: hidden;
+  box-shadow: var(--shadow-premium);
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  color: white;
+}
+
+.rank-bg {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  z-index: 1;
+}
+
+.rank-content {
+  position: relative;
+  z-index: 2;
+  padding: 30rpx;
+}
+
+.rank-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.rank-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+}
+
+.action-hint {
+  font-size: 24rpx;
+  opacity: 0.8;
+  display: flex;
+  align-items: center;
+  gap: 5rpx;
+}
+
+/* Expanded Animation */
+.rank-card.expanded {
+  height: auto;
+}
+
+.rank-details {
+  margin-top: 30rpx;
+  animation: fadeIn 0.4s ease forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10rpx); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.gpa-giant {
+  text-align: center;
+  margin-bottom: 30rpx;
+}
+
+.gpa-giant .label {
+  display: block;
+  font-size: 24rpx;
+  opacity: 0.8;
+  margin-bottom: 5rpx;
+  text-transform: uppercase;
+  letter-spacing: 2rpx;
+}
+
+.gpa-giant .value {
+  font-size: 80rpx;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.stats-row {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background: rgba(255,255,255,0.15);
+  border-radius: 16rpx;
+  padding: 20rpx 0;
+  backdrop-filter: blur(10px);
+}
+
+.stat-item {
+  text-align: center;
+  flex: 1;
+}
+
+.stat-label {
+  display: block;
+  font-size: 22rpx;
+  opacity: 0.8;
+  margin-bottom: 4rpx;
+}
+
+.stat-val {
+  font-size: 30rpx;
+  font-weight: 700;
+}
+
+.stat-line {
+  width: 1px;
+  height: 40rpx;
+  background: rgba(255,255,255,0.2);
+}
+
+/* --- Course List --- */
+.course-list-container {
+  padding: 0 40rpx; /* Increased padding slightly for "narrower" feel */
+  padding-bottom: 50rpx;
+  width: 100%;
+  box-sizing: border-box; /* Explicitly ensure border-box here too */
+}
+
+.semester-section {
+  margin-bottom: 40rpx;
+}
+
+.semester-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 20rpx;
+  padding: 0 10rpx;
+}
+
+.semester-title {
+  font-size: 34rpx;
+  font-weight: 700;
+  color: var(--text-main);
+  position: relative;
+  padding-left: 20rpx;
+}
+
+.semester-title::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 10rpx;
+  bottom: 8rpx;
+  width: 6rpx;
+  border-radius: 4rpx;
+  background: var(--primary-color);
+}
+
+.semester-count {
+  font-size: 24rpx;
+  color: var(--text-secondary);
+}
+
+.course-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.course-card {
+  background: white;
+  padding: 24rpx 30rpx;
+  border-radius: 20rpx;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Fail Card Styling */
+.course-card.fail-card {
+  border-left: 6rpx solid var(--danger-color);
+  background: #fff5f5;
+}
+
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 15rpx;
+}
+
+.course-name {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--text-main);
+  width: 75%;
+}
+
+.course-score {
+  font-size: 34rpx;
+  font-weight: 800;
+  color: var(--success-color);
+}
+
+.course-score.fail-text {
+  color: var(--danger-color);
+}
+
+.card-bottom {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.tag-row {
+  display: flex;
+  gap: 15rpx;
+}
+
+.tag {
+  font-size: 22rpx;
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
+  background: var(--bg-color);
+  color: var(--text-secondary);
+}
+
+.tag-primary {
+  background: #e0e7ff;
+  color: var(--accent-color);
+  font-weight: 500;
+}
+
+.tag-credit {
+  background: #f3f4f6;
+}
+
+.footer-spacing {
+  height: 60rpx;
+}

@@ -1,0 +1,22 @@
+[Unit]
+Description=HBUT 教务系统 API 服务
+After=network.target
+
+[Service]
+Type=simple
+User=www
+Group=www
+WorkingDirectory=/www/wwwroot/hbut.zmj888.asia
+Environment="PATH=/www/server/python/py3.11/bin:/usr/local/bin:/usr/bin:/bin"
+# 使用 uvicorn（推荐）
+ExecStart=/www/server/python/py3.11/bin/uvicorn cjcx+pm:app --host 0.0.0.0 --port 8000 --workers 2
+
+# 或者使用 gunicorn（如果 uvicorn 不可用，取消下面这行的注释，注释掉上面那行）
+# ExecStart=/www/server/python/py3.11/bin/gunicorn cjcx+pm:app --workers 2 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000
+Restart=always
+RestartSec=3
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

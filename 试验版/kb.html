@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HBUT 教务小程序调试 (按周显示)</title>
+    <style>
+        :root { --primary: #007bff; --bg: #f4f7f6; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 20px; color: #333; }
+        .container { max-width: 900px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        h2 { border-bottom: 2px solid var(--primary); padding-bottom: 10px; color: var(--primary); }
+        .panel { display: none; padding: 20px; }
+        .panel.active { display: block; }
+        .form-group { margin-bottom: 15px; }
+        input, button, select { width: 100%; padding: 10px; margin-top:5px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
+        button { background: var(--primary); color: #fff; border: none; cursor: pointer; }
+        button:disabled { background: #ccc; }
+        
+        /* 课表样式 */
+        .timetable-controls { display: flex; gap: 10px; margin-bottom: 15px; align-items: center; background: #eef; padding: 10px; border-radius: 5px;}
+        .timetable-grid { display: grid; grid-template-columns: 40px repeat(7, 1fr); gap: 2px; background: #eee; border: 1px solid #ddd; }
+        .grid-header, .grid-cell { background: #fff; padding: 5px; text-align: center; font-size: 12px; min-height: 50px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .grid-header { font-weight: bold; background: #f8f9fa; }
+        .course-item { 
+            background: #d4edda; border-left: 3px solid #28a745; 
+            padding: 4px; margin: 2px; border-radius: 3px; width: 90%; 
+            font-size: 11px; text-align: left; overflow: hidden;
+        }
+        .week-selector { flex: 1; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>🚀 HBUT 课表调试 (周次筛选版)</h2>
+
+    <!-- 登录面板 -->
+    <div id="panel-login" class="panel active">
+        <h3>统一身份认证</h3>
+        <div class="form-group">
+            <input type="text" id="u_name" placeholder="学号">
+            <input type="password" id="u_pass" placeholder="密码">
+            <div style="display:flex; gap:10px; margin-top:5px;">
+                <input type="text" id="u_captcha" placeholder="验证码">
+                <img id="captcha-img" src="" onclick="loadCaptcha()" style="height:42px; border:1px solid #ddd; cursor:pointer;">
+            </div>
+        </div>
+        <button onclick="doLogin()" id="btn-login">登录</button>
+        <p id="login-msg" style="color:red; margin-top:10px;"></p>
+    </div>
+
+    <!-- 课表面板 -->
+    <div id="panel-timetable" class="panel">
+        <div class="timetable-controls">
+            <div>
+                <label>学期:</label>
+                <input type="text" id="kb-xnxq" value="2025-2026-1" style="width:120px;">
+            </div>
+            <div class="week-selector">
+                <label>选择周次:</label>
+                <select id="week-select" onchange="renderCurrentWeek()">
+                    <!-- JS动态生成 1-25 周 -->
+                </select>
+            </div>
+            <button onclick="fetchTimetableData()" style="width:auto;">🔄 刷新数据</button>
+        </div>
+        
+        <p id="status-text" style="color:blue; font-size:13px;"></p>
+
+        <!-- 课表网格 (7列 + 左侧表头) -->
+        <div class="timetable-grid" id="timetable-view">
+            <!-- JS填充 -->
+        </div>
+    </div>
+</div>
+
+<script>
+    const API = "http://127.0.0.1:8000/api";
+    let tempToken = "";
+    let userToken = "";
+    let allCourses = []; // 存储后端返回的所有课程
+    let currentWeekIndex = 1; // 当前到底是第几周
+
+    window.onload = loadCaptcha;
+
+    // 1. 获取验证码
+    async function loadCaptcha() {
+        try {
+            const res = await fetch(`${API}/captcha`);
+            const json = await res.json();
+            document.getElementById('captcha-img').src = json.data.image;
+            tempToken = json.data.token;
+        } catch (e) { alert("无法连接后端"); }
+    }
+
+    // 2. 登录
+    async function doLogin() {
+        const u = document.getElementById('u_name').value;
+        const p = document.getElementById('u_pass').value;
+        const c = document.getElementById('u_captcha').value;
+        const btn = document.getElementById('btn-login');
+
+        btn.disabled = true;
+        btn.innerText = "登录中...";
+        
+        try {
+            const res = await fetch(`${API}/login`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ token: tempToken, username: u, password: p, captcha: c })
+            });
+            const json = await res.json();
+            
+            if(json.code === 200) {
+                userToken = json.user_token;
+                document.getElementById('panel-login').classList.remove('active');
+                document.getElementById('panel-timetable').classList.add('active');
+                initWeekSelect(); // 初始化下拉框
+                fetchTimetableData(); // 拉取数据
+            } else {
+                document.getElementById('login-msg').innerText = json.msg;
+                loadCaptcha();
+            }
+        } catch (e) { alert("登录请求出错"); }
+        finally { btn.disabled = false; btn.innerText = "登录"; }
+    }
+
+    // 初始化周次下拉框 (1-25周)
+    function initWeekSelect() {
+        const sel = document.getElementById('week-select');
+        sel.innerHTML = "";
+        for(let i=1; i<=25; i++) {
+            sel.innerHTML += `<option value="${i}">第 ${i} 周</option>`;
+        }
+    }
+
+    // 3. 获取课表数据 (后端会返回所有课程 + 当前周次)
+    async function fetchTimetableData() {
+        const xnxq = document.getElementById('kb-xnxq').value;
+        const status = document.getElementById('status-text');
+        status.innerText = "正在获取最新数据...";
+
+        try {
+            const res = await fetch(`${API}/timetable`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ token: userToken, xnxq: xnxq })
+            });
+            const json = await res.json();
+
+            if(json.code === 200) {
+                allCourses = json.data; // 存下所有数据
+                currentWeekIndex = json.current_week || 1; // 获取当前周
+                
+                // 设置下拉框为当前周
+                const sel = document.getElementById('week-select');
+                sel.value = currentWeekIndex;
+                
+                status.innerText = `获取成功！本周是第 ${currentWeekIndex} 周。`;
+                renderCurrentWeek(); // 渲染
+            } else {
+                status.innerText = json.msg;
+            }
+        } catch(e) { status.innerText = "获取失败"; }
+    }
+
+    // 4. 渲染当前选中周的课表
+    function renderCurrentWeek() {
+        const selectedWeek = parseInt(document.getElementById('week-select').value);
+        const grid = document.getElementById('timetable-view');
+        
+        // 4.1 筛选：只保留本周有课的
+        // 逻辑：课程的 weeks_list 数组里 包含 selectedWeek
+        const weekCourses = allCourses.filter(course => {
+            return course.weeks_list.includes(selectedWeek);
+        });
+
+        // 4.2 绘制表头
+        let html = `<div class="grid-header"></div>`;
+        const days = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
+        days.forEach(d => html += `<div class="grid-header">${d}</div>`);
+
+        // 4.3 绘制表格 (1-12节)
+        // 这是一个简单的网格绘制逻辑，实际小程序里推荐用 absolute 定位
+        for (let row = 1; row <= 12; row++) {
+            // 左侧节次
+            html += `<div class="grid-header">${row}</div>`;
+            
+            // 周一到周日
+            for (let day = 1; day <= 7; day++) {
+                // 查找当前格子有没有课
+                // 条件：星期几匹配 && 节次匹配 (row 在 start 和 start+step 之间)
+                const found = weekCourses.find(c => 
+                    c.day === day && row >= c.start && row < (c.start + c.step)
+                );
+
+                if (found) {
+                    // 如果是课程的第一节，显示内容
+                    if (row === found.start) {
+                        html += `
+                        <div class="grid-cell" style="grid-row: span ${found.step}; background:#e3f2fd; border-bottom:1px solid #fff;">
+                            <div class="course-item">
+                                <strong>${found.name}</strong><br>
+                                📍${found.room}<br>
+                                👨‍🏫${found.teacher}
+                            </div>
+                        </div>`;
+                    } else {
+                        // 如果是课程的后续节次，不渲染（因为被第一节的 span 覆盖了，或者忽略）
+                        // 在 CSS Grid 中，如果是 span 覆盖了，这里其实可以填空 div 或者根本不填
+                        // 简单起见，这里我们就不处理 span，直接每节都填，但只第一节显示字
+                        // 更好的做法参考下面：
+                    }
+                } else {
+                    html += `<div class="grid-cell"></div>`;
+                }
+            }
+        }
+        
+        // *注：上面的循环渲染逻辑为了代码简单，对于跨行(span)支持不好。
+        // 为了演示效果，我们换一种简单粗暴的渲染方式：直接渲染格子，不合并单元格
+        // 实际小程序建议使用 flex/absolute 布局
+        
+        let gridHtml = `<div class="grid-header"></div>`;
+        days.forEach(d => gridHtml += `<div class="grid-header">${d}</div>`);
+        
+        for(let row=1; row<=12; row++){
+             gridHtml += `<div class="grid-header">${row}</div>`;
+             for(let day=1; day<=7; day++){
+                 // 找课
+                 const found = weekCourses.find(c => c.day === day && row >= c.start && row < (c.start + c.step));
+                 if(found) {
+                     // 只有当是第一节的时候才显示名字，防止重复显示
+                     if(row === found.start) {
+                         gridHtml += `<div class="grid-cell" style="background:#e3f2fd; color:#333; align-items:flex-start; overflow:hidden;">
+                            <span style="font-size:10px; font-weight:bold;">${found.name}</span>
+                            <span style="font-size:9px;">@${found.room}</span>
+                         </div>`;
+                     } else {
+                         gridHtml += `<div class="grid-cell" style="background:#e3f2fd;"></div>`;
+                     }
+                 } else {
+                     gridHtml += `<div class="grid-cell"></div>`;
+                 }
+             }
+        }
+
+        grid.innerHTML = gridHtml;
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+requests
+beautifulsoup4
+ddddocr==1.4.11
+pycryptodome
+pydantic
+python-multipart

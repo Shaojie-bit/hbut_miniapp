@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>湖北工业大学-课表查询</title>
+    <style>
+        /* 这里是你之前提供的CSS样式，我直接沿用，无需修改 */
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; 
+            margin: 0; 
+            padding: 5px;  /* 缩小内边距 */
+            background-color: #f4f4f9; 
+            color: #333; 
+        }
+        .container { 
+            max-width: 100%;  /* 使用全屏宽度 */
+            margin: auto; 
+            background: #fff; 
+            padding: 10px;  /* 缩小内边距 */
+            border-radius: 8px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+        }
+        h2 { text-align: center; color: #444; }
+        .week-navigator { display: flex; justify-content: center; align-items: center; margin-bottom: 20px; }
+        .week-navigator button { background-color: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 5px; font-size: 1em; cursor: pointer; margin: 0 15px; transition: background-color 0.2s; }
+        .week-navigator button:hover { background-color: #0056b3; }
+        .week-navigator button:disabled { background-color: #cccccc; cursor: not-allowed; }
+        #current-week-info { font-size: 1.2em; font-weight: bold; color: #555; min-width: 250px; text-align: center; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; table-layout: fixed; }
+        th, td { 
+            border: 1px solid #ddd; 
+            padding: 3px 3px;
+            text-align: center; 
+            height: 90px; 
+            word-wrap: break-word; 
+        }
+        /* 添加针对第一列的样式 */
+        th:first-child, td:first-child {
+            width: 45px;  /* 设置固定宽度 */
+            vertical-align: middle;  /* 垂直居中 */
+            padding: 0;  /* 移除内边距以获得更多空间 */
+            font-size: 0.85em;  /* 稍微缩小字体 */
+        }
+        thead th { 
+            background-color: #f8f8f8; 
+            height: auto;  /* 新增此行 */
+            padding: 3px;  /* 新增此行 */
+        }
+        thead #date-header-row th { 
+            font-size: 0.9em; 
+            font-weight: normal; 
+            color: #666; 
+            height: auto; 
+            padding: 3px;  /* 从6px改为3px */
+        }
+        td { vertical-align: top; font-size: 0.9em; }
+        td.has-course { 
+            background-color: #eef7ff;
+            display: table-cell;
+            vertical-align: middle;  /* 添加垂直居中 */
+        }
+        td .course { font-weight: bold; color: #0056b3; }
+        td .teacher, td .classroom, td .weeks { 
+            font-size: 0.85em; 
+            color: #666; 
+            margin-top: 2px;  /* 减小间距 */
+            display: block; 
+        }
+        .practical-courses-container { padding: 15px; border: 1px solid #e0e0e0; border-radius: 5px; background: #fafafa; }
+        .practical-course { padding: 10px; border-bottom: 1px solid #eee; }
+        .practical-course:last-child { border-bottom: none; }
+        .loading, .error { text-align: center; padding: 40px; font-size: 1.2em; color: #888; }
+        /* 新增登录表单的样式 */
+        #login-container { max-width: 400px; margin: 40px auto; padding: 30px; border: 1px solid #ddd; border-radius: 8px; background-color: #fff; }
+        #login-container input { width: 95%; padding: 12px; margin-bottom: 15px; border-radius: 4px; border: 1px solid #ccc; font-size: 1em;}
+        #login-container button { width: 100%; padding: 12px; background-color: #28a745; color: white; border: none; border-radius: 4px; font-size: 1.1em; cursor: pointer; }
+        #login-container button:hover { background-color: #218838; }
+        #login-error { color: red; text-align: center; margin-top: 10px; }
+
+        /* 添加当天课程的样式 */
+        td.today {
+            background-color: #fff8e6;
+        }
+        td.today.has-course .course,
+        td.today.has-course .teacher,
+        td.today.has-course .classroom,
+        td.today.has-course .weeks {
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="login-container">
+        <h2>课表查询登录</h2>
+        <form id="login-form">
+            <input type="text" id="username" placeholder="请输入学号" required>
+            <input type="password" id="password" placeholder="请输入密码" required>
+            <button type="submit" id="login-button">查询课表</button>
+            <div id="login-error"></div>
+        </form>
+    </div>
+
+    <div id="timetable-main-container" style="display: none;">
+        <div class="week-navigator">
+            <button id="prev-week">上一周</button>
+            <span id="current-week-info"></span>
+            <button id="next-week">下一周</button>
+        </div>
+        <div id="timetable-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 45px;"></th>  <!-- 修改这里的宽度 -->
+                        <th>周一</th>
+                        <th>周二</th>
+                        <th>周三</th>
+                        <th>周四</th>
+                        <th>周五</th>
+                    </tr>
+                    <tr id="date-header-row"></tr>
+                </thead>
+                <tbody id="timetable-body"></tbody>
+            </table>
+        </div>
+        <div id="practical-courses-container">
+            <h3 id="practical-title">本周其他课程/实践</h3>
+            <div id="practical-courses-content"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- 配置区域 ---
+    const PROXY_URL = 'http://123.207.9.228:5000/api/get_schedule'; 
+    const SEMESTER_START_DATE = new Date('2025-09-01T00:00:00');
+    // --- 配置结束 ---
+
+    // 全局变量，用于存储登录信息和当前周
+    let currentUser = { username: '', password: '' };
+    let displayedWeek;
+
+    // 获取所有需要的DOM元素
+    const loginContainer = document.getElementById('login-container');
+    const timetableContainer = document.getElementById('timetable-main-container');
+    const loginForm = document.getElementById('login-form');
+    const loginButton = document.getElementById('login-button');
+    const loginError = document.getElementById('login-error');
+    const prevWeekBtn = document.getElementById('prev-week');
+    const nextWeekBtn = document.getElementById('next-week');
+
+    // 从localStorage加载用户信息
+    function loadUserCredentials() {
+        const savedUser = localStorage.getItem('currentUser');
+        if (savedUser) {
+            try {
+                return JSON.parse(savedUser);
+            } catch (e) {
+                localStorage.removeItem('currentUser');
+                return null;
+            }
+        }
+        return null;
+    }
+
+    // 保存用户信息到localStorage
+    function saveUserCredentials(username, password) {
+        localStorage.setItem('currentUser', JSON.stringify({ username, password }));
+    }
+
+    // 页面加载完成后的主逻辑
+    document.addEventListener('DOMContentLoaded', async () => {
+        // 尝试加载保存的用户信息
+        const savedUser = loadUserCredentials();
+        if (savedUser) {
+            currentUser = savedUser;
+            // 计算当前周次并自动登录
+            const actualCurrentWeek = calculateCurrentWeek(SEMESTER_START_DATE);
+            displayedWeek = actualCurrentWeek > 0 ? actualCurrentWeek : 1;
+            await fetchAndRenderTimetable(displayedWeek, true);
+        }
+
+        // 监听登录表单的提交事件
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            currentUser.username = document.getElementById('username').value;
+            currentUser.password = document.getElementById('password').value;
+
+            const actualCurrentWeek = calculateCurrentWeek(SEMESTER_START_DATE);
+            displayedWeek = actualCurrentWeek > 0 ? actualCurrentWeek : 1;
+
+            // 在登录成功后保存用户信息
+            const success = await fetchAndRenderTimetable(displayedWeek, true);
+            if (success) {
+                saveUserCredentials(currentUser.username, currentUser.password);
+            }
+        });
+
+        // 监听上一周/下一周按钮
+        prevWeekBtn.addEventListener('click', () => {
+            if (displayedWeek > 1) {
+                displayedWeek--;
+                fetchAndRenderTimetable(displayedWeek);
+            }
+        });
+
+        nextWeekBtn.addEventListener('click', () => {
+            displayedWeek++;
+            fetchAndRenderTimetable(displayedWeek);
+        });
+    });
+
+    // 修改主函数以返回登录是否成功
+    async function fetchAndRenderTimetable(week, isFirstLoad = false) {
+        const timetableBody = document.getElementById('timetable-body');
+        const practicalContainer = document.getElementById('practical-courses-content');
+        
+        // 显示加载状态
+        if (isFirstLoad) {
+            loginButton.disabled = true;
+            loginButton.textContent = '正在查询...';
+            loginError.textContent = '';
+        } else {
+            timetableBody.innerHTML = `<tr><td colspan="6" class="loading">正在获取第 ${week} 周的课表数据...</td></tr>`;
+            practicalContainer.innerHTML = '';
+        }
+
+        try {
+            const response = await fetch(PROXY_URL.replace('<你的云服务器公网IP>', window.location.hostname === '127.0.0.1' ? '127.0.0.1' : '<你的云服务器公网IP>'), {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                // 将学号、密码、周次一起发给后端
+                body: JSON.stringify({ 
+                    username: currentUser.username, 
+                    password: currentUser.password,
+                    week: week 
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => null);
+                throw new Error(errorData?.error || `网络错误: ${response.statusText}`);
+            }
+            const data = await response.json();
+
+            // 登录成功后的界面切换
+            if (isFirstLoad) {
+                loginContainer.style.display = 'none';
+                timetableContainer.style.display = 'block';
+            }
+
+            // 更新并渲染课表
+            updateViewForWeek(week, data);
+            return true; // 表示成功
+
+        } catch (error) {
+            console.error(`获取第 ${week} 周课表失败:`, error);
+            if (isFirstLoad) {
+                loginError.textContent = `❌ 查询失败！${error.message}`;
+                // 如果是登录失败，清除保存的凭据
+                localStorage.removeItem('currentUser');
+                loginContainer.style.display = 'block';
+                timetableContainer.style.display = 'none';
+            } else {
+                timetableBody.innerHTML = `<tr><td colspan="6" class="error">❌ 获取课表失败！<br>${error.message}</td></tr>`;
+            }
+            return false; // 表示失败
+        } finally {
+            if (isFirstLoad) {
+                loginButton.disabled = false;
+                loginButton.textContent = '查询课表';
+            }
+        }
+    }
+
+    // 更新整个课表视图的函数
+    function updateViewForWeek(week, data) {
+        displayCurrentWeekInfo(week);
+        renderDateHeader(week);
+        // 【注意】这里的 `data.data` 是因为学校API返回的JSON就是这个结构
+        if (data && data.data) {
+             renderTimetableBody(data.data.jcKcxx, week);
+             renderPracticalCourses(data.data.sjk, week);
+        } else {
+             console.error("从服务器返回的数据格式不正确: ", data);
+             document.getElementById('timetable-body').innerHTML = `<tr><td colspan="6" class="error">❌ 返回数据格式错误！</td></tr>`;
+        }
+        prevWeekBtn.disabled = (week <= 1);
+    }
+    
+    // --- 下面的函数都是你之前提供的渲染逻辑，我直接沿用，无需修改 ---
+    function calculateCurrentWeek(startDate) {
+        const today = new Date();
+        const timeDiff = today.getTime() - startDate.getTime();
+        const dayDiff = timeDiff / (1000 * 3600 * 24);
+        if (dayDiff < 0) return 0;
+        return Math.floor(dayDiff / 7) + 1;
+    }
+
+    function displayCurrentWeekInfo(week) {
+        const infoEl = document.getElementById('current-week-info');
+        const today = new Date();
+        const dateString = `${today.getFullYear()}年${today.getMonth() + 1}月${today.getDate()}日`;
+        infoEl.textContent = `${dateString} | 第 ${week} 周`;
+        document.getElementById('practical-title').textContent = `第 ${week} 周其他课程/实践`;
+    }
+
+    function renderDateHeader(week) {
+        const dateHeaderRow = document.getElementById('date-header-row');
+        let headerHTML = '<th></th>';
+        const startOfWeek1 = new Date(SEMESTER_START_DATE);
+        const mondayOfTargetWeek = new Date(startOfWeek1);
+        mondayOfTargetWeek.setDate(startOfWeek1.getDate() + (week - 1) * 7);
+        for (let i = 0; i < 5; i++) {
+            const currentDay = new Date(mondayOfTargetWeek);
+            currentDay.setDate(mondayOfTargetWeek.getDate() + i);
+            const dateStr = `${currentDay.getMonth() + 1}月${currentDay.getDate()}日`;
+            headerHTML += `<th>${dateStr}</th>`;
+        }
+        dateHeaderRow.innerHTML = headerHTML;
+    }
+
+    function renderTimetableBody(coursesByPeriod, currentWeek) {
+        const timetableBody = document.getElementById('timetable-body');
+        if (!coursesByPeriod) {
+            timetableBody.innerHTML = `<tr><td colspan="6">本周无课程安排</td></tr>`;
+            return;
+        }
+        const schedule = Array.from({ length: 12 }, () => Array(8).fill(null));
+        coursesByPeriod.forEach(period => {
+            const periodIndex = parseInt(period.jcbm, 10);
+            if (period.kbxx) {
+                period.kbxx.forEach(daySchedule => {
+                    const dayIndex = parseInt(daySchedule.yzxq, 10);
+                    const courseForThisWeek = daySchedule.kcxx.find(c => {
+                        if (c.kcmc === '-') return false;
+                        if (!c.zcd) return true;
+                        const courseWeeks = parseWeekString(c.zcd);
+                        return courseWeeks.includes(currentWeek);
+                    });
+                    if (courseForThisWeek) schedule[periodIndex][dayIndex] = courseForThisWeek;
+                });
+            }
+        });
+        const periodLabels = ["1-2节", "3-4节", "5-6节", "7-8节", "9-11节"];
+        const periodIndices = [[1, 2], [3, 4], [5, 6], [7, 8], [9, 10, 11]];
+        let tableBodyHTML = '';
+        const today = new Date().getDay(); // 获取今天是周几 (0是周日，1-6是周一到周六)
+        
+        // 在生成HTML时添加today类
+        periodIndices.forEach((indices, i) => {
+            tableBodyHTML += `<tr><td>${periodLabels[i]}</td>`;
+            for (let day = 1; day <= 5; day++) {
+                const course = indices.map(index => schedule[index]?.[day]).find(c => c);
+                const isToday = today === day; // 判断是否是当天
+                if (course) {
+                    const weeksHTML = course.zcd ? `<div class="weeks">${course.zcd}</div>` : '';
+                    const cellContent = `<div class="course">${course.kcmc}</div><div class="teacher">${course.teacher}</div><div class="classroom">${course.classroom}</div>${weeksHTML}`;
+                    tableBodyHTML += `<td class="has-course${isToday ? ' today' : ''}">${cellContent}</td>`;
+                } else {
+                    tableBodyHTML += `<td${isToday ? ' class="today"' : ''}></td>`;
+                }
+            }
+            tableBodyHTML += `</tr>`;
+        });
+        timetableBody.innerHTML = tableBodyHTML;
+    }
+    
+    function renderPracticalCourses(courses, currentWeek) {
+        const contentEl = document.getElementById('practical-courses-content');
+        if (!courses) {
+            contentEl.innerHTML = '<p>本周没有其他课程或实践。</p>';
+            return;
+        }
+        const uniqueCourses = new Map();
+        courses.forEach(c => {
+            const key = c.kcmc + c.zcstr;
+            if (!uniqueCourses.has(key)) uniqueCourses.set(key, c);
+        });
+        const activeCourses = Array.from(uniqueCourses.values()).filter(course => {
+            const weekRanges = parseWeekString(course.zcstr);
+            return weekRanges.includes(currentWeek);
+        });
+        if (activeCourses.length > 0) {
+            contentEl.innerHTML = activeCourses.map(c => `<div class="practical-course"><strong>${c.kcmc}</strong> (${c.type})<br><small>周次: ${c.zcstr} | 班级: ${c.jxbzc}</small></div>`).join('');
+        } else {
+            contentEl.innerHTML = '<p>本周没有其他课程或实践。</p>';
+        }
+    }
+
+    function parseWeekString(weekStr) {
+        if (!weekStr) return [];
+        const weeks = [];
+        const typeMatch = weekStr.match(/[(（]([单双])[)）]/);
+        const type = typeMatch ? typeMatch[1] : null;
+        const cleanStr = weekStr.replace(/[(（]([单双])[)）]/, '');
+        const parts = cleanStr.replace(/周/g, '').split(',');
+        parts.forEach(part => {
+            if (part.includes('-')) {
+                const [start, end] = part.split('-').map(Number);
+                for (let i = start; i <= end; i++) {
+                    if (!type || (type === '单' && i % 2 !== 0) || (type === '双' && i % 2 === 0)) {
+                        weeks.push(i);
+                    }
+                }
+            } else if (part) {
+                weeks.push(Number(part));
+            }
+        });
+        return weeks;
+    }
+</script>
+</body>
+</html>
